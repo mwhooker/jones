@@ -28,7 +28,7 @@ class Jones(object):
     def set_config(self, env, conf):
         """Set conf to env under service.
         
-        "/" is the root of the config tree.
+        pass None to env for root.
         """
 
         self._set(self._get_env_path(env), conf)
@@ -59,6 +59,7 @@ class Jones(object):
     def _get_path(self, prefix, env):
         if not env:
             return prefix
+        assert env[0] != '/'
         return '/'.join((prefix, env))
 
 
