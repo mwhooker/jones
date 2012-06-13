@@ -25,13 +25,33 @@ class Jones(object):
             self.zk.create_recursive(k, '', zc.zk.OPEN_ACL_UNSAFE)
 
 
-    def set_config(self, env, conf):
+    def create_config(self, env, conf):
         """Set conf to env under service.
-        
+
         pass None to env for root.
         """
 
-        self._set(self._get_env_path(env), conf)
+        self.zk.create(
+            self._get_env_path(env),
+            json.dumps(conf),
+            zc.zk.OPEN_ACL_UNSAFE
+        )
+
+        if env:
+            self._flatten_to_view(env)
+
+
+    def set_config(self, env, conf, version):
+        """Set conf to env under service.
+
+        pass None to env for root.
+        """
+
+        self.zk.set(
+            self._get_env_path(env),
+            json.dumps(conf),
+            version
+        )
 
         if env:
             self._flatten_to_view(env)
@@ -80,15 +100,14 @@ class Jones(object):
 
         data = {}
         for n in path:
-            config = self._get(n) 
+            config = self._get(n)
             data.update(config)
 
-        self._set(dest, data)
+        if not self.zk.exists(dest):
+            self.zk.create(dest, '', zc.zk.OPEN_ACL_UNSAFE)
 
-    def _set(self, path, data):
-        if not self.zk.exists(path):
-            self.zk.create(path, '', zc.zk.OPEN_ACL_UNSAFE)
-        self.zk.properties(path).set(config=json.dumps(data))
+        self.zk.set(dest, json.dumps(data))
 
     def _get(self, path):
-        return json.loads(self.zk.properties(path).get('config'))
+        data, metadata = self.zk.get(path)
+        return json.loads(data)
