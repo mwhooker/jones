@@ -86,7 +86,8 @@ class Jones(object):
         self._set(dest, data)
 
     def _set(self, path, data):
-        self.zk.create(path, '', zc.zk.OPEN_ACL_UNSAFE)
+        if not self.zk.exists(path):
+            self.zk.create(path, '', zc.zk.OPEN_ACL_UNSAFE)
         self.zk.properties(path).set(config=json.dumps(data))
 
     def _get(self, path):

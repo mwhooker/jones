@@ -54,3 +54,12 @@ class TestJones(TestCase):
         for k in ('root', 'parent', 'child1'):
             child1.update(**CONFIG[k])
         self.assertEquals(child1, self.jones.get_config('127.0.0.2'))
+
+    def test_overwrites(self):
+        self.jones.set_config(None, {"foo": "bar"})
+        self.jones.set_config(None, {"foo": "baz"})
+
+        self.assertEquals(
+            self.jones._get(self.jones.conf_path)['foo'],
+            'baz'
+        )
