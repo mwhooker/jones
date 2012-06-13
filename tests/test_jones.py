@@ -47,8 +47,8 @@ class TestJones(TestCase):
         self.jones.create_config('parent/child1', CONFIG['child1'])
         self.jones.create_config('parent/child2', CONFIG['child2'])
         self.jones.create_config('parent/child1/subchild1', CONFIG['subchild1'])
-        self.jones.assoc_ip('127.0.0.1', 'parent')
-        self.jones.assoc_ip('127.0.0.2', 'parent/child1')
+        self.jones.assoc_host('127.0.0.1', 'parent')
+        self.jones.assoc_host('127.0.0.2', 'parent/child1')
         #self.zk.print_tree('/services')
 
         child1 = {}

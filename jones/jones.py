@@ -5,9 +5,13 @@ from functools import partial
 class Jones(object):
     """
 
-    "view" refers to a node which has has the following algorithm applied
-        for node in root -> env
-            update view with node.config
+    Glossary:
+        view
+            refers to a node which has has the following algorithm applied
+            for node in root -> env
+                update view with node.config
+        environment
+            a node in the service graph
     """
 
     def __init__(self, service, zk):
@@ -26,7 +30,8 @@ class Jones(object):
 
 
     def create_config(self, env, conf):
-        """Set conf to env under service.
+        """
+        Set conf to env under service.
 
         pass None to env for root.
         """
@@ -42,7 +47,8 @@ class Jones(object):
 
 
     def set_config(self, env, conf, version):
-        """Set conf to env under service.
+        """
+        Set conf to env under service.
 
         pass None to env for root.
         """
@@ -57,23 +63,28 @@ class Jones(object):
             self._flatten_to_view(env)
 
 
-    def get_config(self, ip):
+    def get_config(self, hostname):
         return self._get(
-            self.zk.resolve(self._get_nodemap_path(ip))
+            self.zk.resolve(self._get_nodemap_path(hostname))
         )
 
 
-    def assoc_ip(self, ip, env):
-        """Associate ip with env under service."""
+    def assoc_host(self, hostname, env):
+        """
+        Associate a host with an environment.
+
+        hostname is opaque to Jones. Any string which uniquely identifies a host
+        is acceptable.
+        """
 
         self.zk.ln(
             self._get_view_path(env),
-            self._get_nodemap_path(ip)
+            self._get_nodemap_path(hostname)
         )
 
 
-    def _get_nodemap_path(self, ip):
-        return "%s/%s" % (self.nodemap_path, ip)
+    def _get_nodemap_path(self, hostname):
+        return "%s/%s" % (self.nodemap_path, hostname)
 
 
     def _get_path(self, prefix, env):
