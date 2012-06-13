@@ -63,3 +63,21 @@ class TestJones(TestCase):
             self.jones._get(self.jones.conf_path)['foo'],
             'baz'
         )
+
+    def test_conflicts(self):
+        jones2 = Jones('testservice', self.zk)
+
+        self.jones.set_config(None, {"foo": "bar"})
+        jones2.set_config(None, {"foo": "baz"})
+        print self.jones._get(self.jones.conf_path)['foo']
+        print jones2._get(self.jones.conf_path)['foo']
+
+
+
+# TODO:
+#   Test for MVCC
+#
+# Two race conditions
+#   2 ppl access a node
+#       one and then the other updates
+#       The second to update clobbers the first update
