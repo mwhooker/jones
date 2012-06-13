@@ -47,9 +47,9 @@ class Jones(object):
         pass None to env for root.
         """
 
-        self.zk.set(
+        self._set(
             self._get_env_path(env),
-            json.dumps(conf),
+            conf,
             version
         )
 
@@ -100,14 +100,17 @@ class Jones(object):
 
         data = {}
         for n in path:
-            config = self._get(n)
+            _, config = self._get(n)
             data.update(config)
 
         if not self.zk.exists(dest):
             self.zk.create(dest, '', zc.zk.OPEN_ACL_UNSAFE)
 
-        self.zk.set(dest, json.dumps(data))
+        self._set(dest, data)
 
     def _get(self, path):
         data, metadata = self.zk.get(path)
-        return json.loads(data)
+        return metadata['version'], json.loads(data)
+
+    def _set(self, path, data, *args, **kwargs):
+        return self.zk.set(path, json.dumps(data), *args, **kwargs)

@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 from unittest import TestCase
 import zc.zk
+import zookeeper
 from zc.zk import testing
 
 from jones import Jones
@@ -53,33 +54,29 @@ class TestJones(TestCase):
         child1 = {}
         for k in ('root', 'parent', 'child1'):
             child1.update(**CONFIG[k])
-        self.assertEquals(child1, self.jones.get_config('127.0.0.2'))
+        self.assertEquals(child1, self.jones.get_config('127.0.0.2')[1])
 
     def test_overwrites(self):
         self.jones.create_config(None, {"foo": "bar"})
         self.jones.set_config(None, {"foo": "baz"}, -1)
 
         self.assertEquals(
-            self.jones._get(self.jones.conf_path)['foo'],
+            self.jones._get(self.jones.conf_path)[1]['foo'],
             'baz'
         )
 
-    """
     def test_conflicts(self):
-        jones2 = Jones('testservice', self.zk)
 
-        self.jones.set_config(None, {"foo": "bar"})
-        jones2.set_config(None, {"foo": "baz"})
-        print self.jones._get(self.jones.conf_path)['foo']
-        print jones2._get(self.jones.conf_path)['foo']
-    """
+        self.jones.create_config(None, {"foo": "bar"})
+        self.jones.set_config(None, {"foo": "baz"}, 0)
 
+        self.assertEquals(
+            self.jones._get(self.jones.conf_path)[1]['foo'],
+            'baz'
+        )
 
-
-# TODO:
-#   Test for MVCC
-#
-# Two race conditions
-#   2 ppl access a node
-#       one and then the other updates
-#       The second to update clobbers the first update
+        self.assertRaises(
+            zookeeper.BadVersionException,
+            self.jones.set_config,
+            None, {"foo": "bag"}, 4,
+        )
