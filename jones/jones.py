@@ -1,3 +1,4 @@
+import collections
 import json
 import zc.zk
 from functools import partial
@@ -36,6 +37,9 @@ class Jones(object):
         pass None to env for root.
         """
 
+        if not isinstance(conf, collections.Mapping):
+            raise ValueError("conf must be a collections.Mapping")
+
         self.zk.create(
             self._get_env_path(env),
             json.dumps(conf),
@@ -52,6 +56,9 @@ class Jones(object):
 
         pass None to env for root.
         """
+
+        if not isinstance(conf, collections.Mapping):
+            raise ValueError("conf must be a collections.Mapping")
 
         self._set(
             self._get_env_path(env),

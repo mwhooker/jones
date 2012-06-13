@@ -80,3 +80,10 @@ class TestJones(TestCase):
             self.jones.set_config,
             None, {"foo": "bag"}, 4,
         )
+
+    def test_conf_is_mapping(self):
+        self.assertRaises(
+            ValueError,
+            self.jones.create_config,
+            None, 'hello'
+        )
