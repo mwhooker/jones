@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 from unittest import TestCase
 import zc.zk
-from zc.zk import zookeeper
+from zc.zk import testing
 
 from jones import Jones
 
@@ -30,14 +30,14 @@ CONFIG = {
 class TestJones(TestCase):
 
     def setUp(self):
-        self.zk = zc.zk.ZooKeeper('localhost:2181')
-
-        try:
-            self.zk.delete_recursive('/services')
-        except zookeeper.NoNodeException:
-            pass
+        cs = 'zookeeper.example.com:2181'
+        testing.setUp(self, connection_string=cs)
+        self.zk = zc.zk.ZooKeeper(cs)
 
         self.jones = Jones('testservice', self.zk)
+
+    def tearDown(self):
+        testing.tearDown(self)
 
     def test_jones(self):
 
