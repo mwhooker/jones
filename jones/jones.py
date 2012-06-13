@@ -7,7 +7,7 @@ class Jones(object):
 
     "view" refers to a node which has has the following algorithm applied
         for node in root -> env
-            update config with node.config
+            update view with node.config
     """
 
     def __init__(self, service, zk):
