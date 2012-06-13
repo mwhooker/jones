@@ -71,6 +71,11 @@ class Jones(object):
 
 
     def get_config(self, hostname):
+        """
+        Returns a 2-tuple like (version, data).
+
+        Version must be used with future calls to set_config.
+        """
         return self._get(
             self.zk.resolve(self._get_nodemap_path(hostname))
         )

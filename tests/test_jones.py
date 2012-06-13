@@ -3,29 +3,10 @@ from unittest import TestCase
 import zc.zk
 import zookeeper
 from zc.zk import testing
+from tests import fixture
 
 from jones import Jones
 
-
-CONFIG = {
-    'parent': {
-        'a': 1,
-        'b': [1, 2, 3],
-        'c': {'x': 0}
-    },
-    'child1': {
-        'a': 2
-    },
-    'child2': {
-        'a': 3
-    },
-    'subchild1': {
-        'b': "abc"
-    },
-    'root': {
-        'foo': 'bar'
-    }
-}
 
 
 class TestJones(TestCase):
@@ -42,19 +23,10 @@ class TestJones(TestCase):
 
     def test_jones(self):
 
-        self.jones.create_config(None, CONFIG['root'])
-        self.jones.create_config('parent' , CONFIG['parent'])
-        self.jones.create_config('parent/child1', CONFIG['child1'])
-        self.jones.create_config('parent/child2', CONFIG['child2'])
-        self.jones.create_config('parent/child1/subchild1', CONFIG['subchild1'])
-        self.jones.assoc_host('127.0.0.1', 'parent')
-        self.jones.assoc_host('127.0.0.2', 'parent/child1')
         #self.zk.print_tree('/services')
 
-        child1 = {}
-        for k in ('root', 'parent', 'child1'):
-            child1.update(**CONFIG[k])
-        self.assertEquals(child1, self.jones.get_config('127.0.0.2')[1])
+        fixture.init_tree(self.jones)
+        self.assertEquals(fixture.CHILD1, self.jones.get_config('127.0.0.2')[1])
 
     def test_overwrites(self):
         self.jones.create_config(None, {"foo": "bar"})
@@ -64,6 +36,12 @@ class TestJones(TestCase):
             self.jones._get(self.jones.conf_path)[1]['foo'],
             'baz'
         )
+
+    def test_parent_changed(self):
+        fixture.init_tree(self.jones)
+        self.jones.set_config('parent', {"new": "key"}, 0)
+        _, config = self.jones.get_config('127.0.0.2')
+        self.assertEquals(config['new'], 'key')
 
     def test_conflicts(self):
 
