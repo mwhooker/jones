@@ -51,7 +51,7 @@ class TestJones(TestCase):
         parent = dict(fixture.CONFIG['parent'])
         parent['new'] = 'key'
         self.jones.set_config('parent', parent, 0)
-        self.zk.print_tree('/services')
+        #self.zk.print_tree('/services')
 
         for i in fixture.HOSTS:
             _, config = self.jones.get_config(i)

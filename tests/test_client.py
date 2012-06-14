@@ -34,11 +34,11 @@ class TestJonesClient(TestCase):
         testing.tearDown(self)
 
     def test_gets_config(self):
-        return
         jones = Jones(self.service, self.zk)
         fixture.init_tree(jones)
         
         c = JonesClient(self.service, self.zk, self.default_cb, '127.0.0.2')
         self.assertEquals(self.config, fixture.CHILD1)
-        jones.set_config('parent', {'k': "I changed"}, -1)
-        print self.config
+        fixt = "I changed"
+        jones.set_config('parent', {'k': fixt}, -1)
+        self.assertEquals(self.config['k'], fixt)
