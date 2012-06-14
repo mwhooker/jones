@@ -1,8 +1,6 @@
 from __future__ import unicode_literals
 from unittest import TestCase
 import zc.zk
-import zookeeper
-import os.path
 from zc.zk import testing
 
 from tests import fixture
