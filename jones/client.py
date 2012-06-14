@@ -40,13 +40,15 @@ class JonesClient(object):
         if not hostname:
             hostname = socket.getfqdn()
         self.hostname = hostname
-        print self.hostname
 
-        key = "/services/%s/nodemaps" % service
+        root = "/services/%s/nodemaps" % service
+        self.lookup_key = root + '/' + hostname
 
-        print self.zk.get(key)
-        self.config_key = self.zk.resolve(key + '/' + hostname)
+        self.nodemap = self.zk.properties(root)
+        self.nodemap(self._on_nodemap_change)
 
-        print self.config_key
+    def _on_nodemap_change(self, _):
+        self.config_key = self.zk.resolve(self.lookup_key)
+
         self.node = self.zk.properties(self.config_key)
         self.node(lambda node: self.cb(node.data))
