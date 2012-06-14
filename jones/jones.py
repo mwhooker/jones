@@ -3,6 +3,7 @@ import json
 import zc.zk
 from functools import partial
 
+
 class Jones(object):
     """
 
@@ -32,7 +33,6 @@ class Jones(object):
         for k in (self.view_path, self.nodemap_path):
             self.zk.create_recursive(k, '', zc.zk.OPEN_ACL_UNSAFE)
 
-
     def create_config(self, env, conf):
         """
         Set conf to env under service.
@@ -51,7 +51,6 @@ class Jones(object):
 
         self._update_view(env)
 
-
     def set_config(self, env, conf, version):
         """
         Set conf to env under service.
@@ -68,7 +67,6 @@ class Jones(object):
             version
         )
 
-
         def propogate(src):
             """Update env's children with new config."""
 
@@ -81,7 +79,6 @@ class Jones(object):
 
         propogate(env)
 
-
     def get_config(self, hostname):
         """
         Returns a 2-tuple like (version, data).
@@ -92,20 +89,18 @@ class Jones(object):
             self.zk.resolve(self._get_nodemap_path(hostname))
         )
 
-
     def assoc_host(self, hostname, env):
         """
         Associate a host with an environment.
 
-        hostname is opaque to Jones. Any string which uniquely identifies a host
-        is acceptable.
+        hostname is opaque to Jones.
+        Any string which uniquely identifies a host is acceptable.
         """
 
         self.zk.ln(
             self._get_view_path(env),
             self._get_nodemap_path(hostname)
         )
-
 
     def _flatten_to_root(self, env):
         """
@@ -115,7 +110,7 @@ class Jones(object):
         nodes = env.split('/')
 
         # Path through the znode graph from root ('') to env
-        path = [nodes[:n] for n in xrange(len(nodes)+1)]
+        path = [nodes[:n] for n in xrange(len(nodes) + 1)]
 
         # Expand path and map it to the root
         path = map(
@@ -130,7 +125,6 @@ class Jones(object):
 
         return data
 
-
     def _update_view(self, env):
         if not env:
             env = ''
@@ -141,10 +135,8 @@ class Jones(object):
 
         self._set(dest, self._flatten_to_root(env))
 
-
     def _get_nodemap_path(self, hostname):
         return "%s/%s" % (self.nodemap_path, hostname)
-
 
     def _get_path(self, prefix, env):
         if not env:
@@ -152,11 +144,9 @@ class Jones(object):
         assert env[0] != '/'
         return '/'.join((prefix, env))
 
-
     def _get(self, path):
         data, metadata = self.zk.get(path)
         return metadata['version'], json.loads(data)
-
 
     def _set(self, path, data, *args, **kwargs):
         return self.zk.set(path, json.dumps(data), *args, **kwargs)

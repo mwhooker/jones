@@ -10,7 +10,6 @@ from zc.zk import testing
 from jones import Jones
 
 
-
 class TestJones(TestCase):
 
     def setUp(self):
@@ -35,7 +34,10 @@ class TestJones(TestCase):
     def test_jones(self):
 
         fixture.init_tree(self.jones)
-        self.assertEquals(fixture.CHILD1, self.jones.get_config('127.0.0.2')[1])
+        self.assertEquals(
+            fixture.CHILD1,
+            self.jones.get_config('127.0.0.2')[1]
+        )
 
     def test_overwrites(self):
         self.jones.create_config(None, {"foo": "bar"})

@@ -23,13 +23,6 @@ class TestJonesClient(TestCase):
         self.client = JonesClient(self.service, self.zk, self.default_cb,
                                   self.hostname)
 
-        """
-        fixture_path = os.path.join(os.path.dirname(__file__), 'zktree.fixture')
-
-        with open(fixture_path) as zkt:
-            self.zk.import_tree(zkt.read())
-        """
-
     def default_cb(self, config):
         print "got new config"
         print config
@@ -39,7 +32,7 @@ class TestJonesClient(TestCase):
         testing.tearDown(self)
 
     def test_gets_config(self):
-        
+
         self.assertEquals(self.config, fixture.CHILD1)
         fixt = "I changed"
         self.jones.set_config('parent', {'k': fixt}, -1)
