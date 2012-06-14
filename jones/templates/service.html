@@ -1,0 +1,34 @@
+{% extends "layout.html" %}
+{% set page_title = "Jones" %}
+{% block body %}
+
+<h2>{{ service }}</h2>
+<h3>{{env}}</h3>
+
+<table class="table table-bordered">
+    <tbody>
+        {% for child in children %}
+        {% set ischild = (child[1:] == env) %}
+            <tr>
+                <td>
+                    {% if ischild%}
+                    <strong>
+                    {% endif %}
+                    <a href="/service/{{ service }}{{ child }}">
+                        {% if child %}
+                        {{child}}
+                        {% else %}
+                        /
+                        {% endif %}
+                    </a>
+                    {% if ischild %}
+                    </strong>
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<pre> {{ config }}</pre>
+<pre> {{ view }}</pre>
+{% endblock %}

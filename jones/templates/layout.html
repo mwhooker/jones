@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Jones</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel=stylesheet href="{{ url_for('.static', filename='css/bootstrap.css') }}">
+    {% block head %}{% endblock %}
+
+  </head>
+
+  <body>
+
+    <div class="container">
+
+        <header class="subhead" id="overview">
+          <h1>{{ page_title }}</h1>
+          {% block header %}{% endblock header %}
+        </header>
+
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            <div class="row span8">
+                {% for message in messages %}
+                <div class="alert alert-info">
+                    <button class="close" data-dismiss="alert">×</button>
+                    {{ message }}
+                </div>
+                {% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
+
+        {% block body %}{% endblock %}
+    </div>
+
+    {% block footer %}{% endblock %}
+
+  </body>
+</html>
