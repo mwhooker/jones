@@ -13,6 +13,9 @@ class Jones(object):
                 update view with node.config
         environment
             a node in the service graph
+            as passed to get/set config, it should identify
+                the node within the service
+                i.e. "production" or "dev/mwhooker"
     """
 
     def __init__(self, service, zk):
@@ -46,8 +49,7 @@ class Jones(object):
             zc.zk.OPEN_ACL_UNSAFE
         )
 
-        if env:
-            self._flatten_to_view(env)
+        self._update_view(env)
 
 
     def set_config(self, env, conf, version):
@@ -66,8 +68,18 @@ class Jones(object):
             version
         )
 
-        if env:
-            self._flatten_to_view(env)
+
+        def propogate(src):
+            """Update env's children with new config."""
+
+            self._update_view(src)
+            path = self._get_env_path(src)
+            for child in self.zk.get_children(path):
+                if src:
+                    child = "%s/%s" % (src, child)
+                propogate(child)
+
+        propogate(env)
 
 
     def get_config(self, hostname):
@@ -95,21 +107,11 @@ class Jones(object):
         )
 
 
-    def _get_nodemap_path(self, hostname):
-        return "%s/%s" % (self.nodemap_path, hostname)
+    def _flatten_to_root(self, env):
+        """
+        Flatten values from root down in to new view.
+        """
 
-
-    def _get_path(self, prefix, env):
-        if not env:
-            return prefix
-        assert env[0] != '/'
-        return '/'.join((prefix, env))
-
-
-    def _flatten_to_view(self, env):
-        """Roll up from root to env. Store in env view."""
-
-        dest = self._get_view_path(env)
         nodes = env.split('/')
 
         # Path through the znode graph from root ('') to env
@@ -126,14 +128,35 @@ class Jones(object):
             _, config = self._get(n)
             data.update(config)
 
+        return data
+
+
+    def _update_view(self, env):
+        if not env:
+            env = ''
+
+        dest = self._get_view_path(env)
         if not self.zk.exists(dest):
             self.zk.create(dest, '', zc.zk.OPEN_ACL_UNSAFE)
 
-        self._set(dest, data)
+        self._set(dest, self._flatten_to_root(env))
+
+
+    def _get_nodemap_path(self, hostname):
+        return "%s/%s" % (self.nodemap_path, hostname)
+
+
+    def _get_path(self, prefix, env):
+        if not env:
+            return prefix
+        assert env[0] != '/'
+        return '/'.join((prefix, env))
+
 
     def _get(self, path):
         data, metadata = self.zk.get(path)
         return metadata['version'], json.loads(data)
+
 
     def _set(self, path, data, *args, **kwargs):
         return self.zk.set(path, json.dumps(data), *args, **kwargs)

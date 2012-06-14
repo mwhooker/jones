@@ -1,9 +1,11 @@
 from __future__ import unicode_literals
-from unittest import TestCase
+import json
 import zc.zk
 import zookeeper
-from zc.zk import testing
+
 from tests import fixture
+from unittest import TestCase
+from zc.zk import testing
 
 from jones import Jones
 
@@ -21,9 +23,16 @@ class TestJones(TestCase):
     def tearDown(self):
         testing.tearDown(self)
 
-    def test_jones(self):
+    def test_creates_root(self):
 
-        #self.zk.print_tree('/services')
+        fixt = {'xy': 'z'}
+        self.jones.create_config(None, fixt)
+        self.assertEquals(
+            json.loads(self.zk.get(self.jones.view_path)[0]),
+            fixt
+        )
+
+    def test_jones(self):
 
         fixture.init_tree(self.jones)
         self.assertEquals(fixture.CHILD1, self.jones.get_config('127.0.0.2')[1])
@@ -39,9 +48,17 @@ class TestJones(TestCase):
 
     def test_parent_changed(self):
         fixture.init_tree(self.jones)
-        self.jones.set_config('parent', {"new": "key"}, 0)
-        _, config = self.jones.get_config('127.0.0.2')
-        self.assertEquals(config['new'], 'key')
+        parent = dict(fixture.CONFIG['parent'])
+        parent['new'] = 'key'
+        self.jones.set_config('parent', parent, 0)
+        self.zk.print_tree('/services')
+
+        for i in fixture.HOSTS:
+            _, config = self.jones.get_config(i)
+            self.assertEquals(config.get('b'), [1, 2, 3],
+                             "Host %s didn't inherit properly." % i)
+            self.assertEquals(config.get('new'), 'key',
+                              "Host %s not updated." % i)
 
     def test_conflicts(self):
 
