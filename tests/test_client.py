@@ -19,6 +19,9 @@ class TestJonesClient(TestCase):
         cs = 'zookeeper.example.com:2181'
         testing.setUp(self, connection_string=cs)
         self.zk = zc.zk.ZooKeeper(cs)
+        self.jones = Jones(self.service, self.zk)
+        fixture.init_tree(self.jones)
+        self.client = JonesClient(self.service, self.zk, self.default_cb, '127.0.0.2')
 
         """
         fixture_path = os.path.join(os.path.dirname(__file__), 'zktree.fixture')
@@ -34,11 +37,12 @@ class TestJonesClient(TestCase):
         testing.tearDown(self)
 
     def test_gets_config(self):
-        jones = Jones(self.service, self.zk)
-        fixture.init_tree(jones)
         
-        c = JonesClient(self.service, self.zk, self.default_cb, '127.0.0.2')
         self.assertEquals(self.config, fixture.CHILD1)
         fixt = "I changed"
-        jones.set_config('parent', {'k': fixt}, -1)
+        self.jones.set_config('parent', {'k': fixt}, -1)
         self.assertEquals(self.config['k'], fixt)
+
+    def test_responds_to_remap(self):
+        """test that changing the associations updates config properly."""
+
