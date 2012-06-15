@@ -18,6 +18,7 @@ limitations under the License.
 from flask import Flask, render_template
 from raven.contrib.flask import Sentry
 from werkzeug.contrib.fixers import ProxyFix
+import json
 import zc.zk
 
 from jones import Jones
@@ -33,6 +34,10 @@ if 'SENTRY_DSN' in app.config:
     sentry = Sentry(app)
 
 zk = zc.zk.ZooKeeper(app.config['ZK_CONNECTION_STRING'])
+
+@app.template_filter()
+def as_json(d, indent=None):
+    return json.dumps(d, indent=indent)
 
 
 @app.route('/')

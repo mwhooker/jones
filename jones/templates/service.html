@@ -3,7 +3,7 @@
 {% block body %}
 
 <h2>{{ service }}</h2>
-<h3>{{env}}</h3>
+<h3>/{{env}}</h3>
 
 <table class="table table-bordered">
     <tbody>
@@ -29,6 +29,6 @@
         {% endfor %}
     </tbody>
 </table>
-<pre> {{ view }}</pre>
+<pre> {{ view | as_json(2)}}</pre>
 <pre> {{ config }}</pre>
 {% endblock %}
