@@ -51,11 +51,7 @@ def index():
 @app.route('/service/<string:service>/<path:env>')
 def service(service, env):
     j = Jones(service, zk)
-    """
-    prefix = '/services/%s/conf' % service
-    if len(env):
-        prefix += "/%s" % env
-    """
+
     children = j.get_child_envs('')
     config = j.get_config_by_env(env)[1]
     view = j.get_view_by_env(env)[1]
