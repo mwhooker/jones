@@ -9,17 +9,13 @@ var config = {{ config | tojson |safe }};
 {% block body %}
 
 <h2>{{ service }}</h2>
-<h3>/
-    {% if env %}
-    {{env}}
-    {% endif %}
-</h3>
+<h3>/{% if env %}{{env}}{% endif %}</h3>
 
 <table class="table table-bordered">
     <tbody>
         {% for child in children %}
         {# TODO: doesn't work for root (/) #}
-        {% set ischild = (child[1:] == env) %}
+        {% set ischild = (child[1:] == (env or '')) %}
             <tr>
                 <td>
                     {% if ischild%}
