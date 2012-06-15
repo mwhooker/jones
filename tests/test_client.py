@@ -62,3 +62,14 @@ class TestJonesClient(TestCase):
 
         self.jones.assoc_host(self.hostname, 'parent')
         self.assertEquals(self.config, fixt)
+
+    def test_defaults_to_root(self):
+        """
+        If a hostname doesn't map to anything,
+        make sure to default to the root. That way we don't have to add every
+        host under our control to zk.
+        """
+        hostname = '0.0.0.0'
+        client = JonesClient(self.service, self.zk, self.default_cb, hostname)
+        self.assertTrue(hostname not in fixture.HOSTS)
+        self.assertEquals(self.config, fixture.CONFIG['root'])
