@@ -42,6 +42,7 @@ PARENT = {}
 for k in ('root', 'parent'):
     PARENT.update(**CONFIG[k])
 
+
 def init_tree(jones):
     jones.create_config(None, CONFIG['root'])
     jones.create_config('parent', CONFIG['parent'])

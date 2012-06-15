@@ -36,6 +36,7 @@ if 'SENTRY_DSN' in app.config:
 
 zk = zc.zk.ZooKeeper(app.config['ZK_CONNECTION_STRING'])
 
+
 @app.template_filter()
 def as_json(d, indent=None):
     return Markup(json.dumps(d, indent=indent))
