@@ -14,21 +14,20 @@ var config = {{ config | tojson |safe }};
     <div class="well span4">
         <ul class="unstyled">
             {% for child in children %}
-            {# TODO: doesn't work for root (/) #}
             {% set ischild = (child[1:] == (env or '')) %}
+            {% if child %}
+                {% set child_pretty = child %}
+            {% else %}
+                {% set child_pretty = "/" %}
+            {% endif %}
+
             <li>
             {% if ischild%}
-            <strong>
-                {% endif %}
+            <strong>{{ child_pretty }}</strong>
+            {% else %}
                 <a href="/service/{{ service }}{{ child }}">
-                    {% if child %}
-                    {{child}}
-                    {% else %}
-                    /
-                    {% endif %}
+                    {{ child_pretty }}
                 </a>
-                {% if ischild %}
-            </strong>
             {% endif %}
             </li>
             {% endfor %}
