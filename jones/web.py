@@ -18,6 +18,7 @@ limitations under the License.
 from flask import Flask, render_template
 from raven.contrib.flask import Sentry
 from werkzeug.contrib.fixers import ProxyFix
+from jinja2 import Markup
 import json
 import zc.zk
 
@@ -37,13 +38,14 @@ zk = zc.zk.ZooKeeper(app.config['ZK_CONNECTION_STRING'])
 
 @app.template_filter()
 def as_json(d, indent=None):
-    return json.dumps(d, indent=indent)
+    return Markup(json.dumps(d, indent=indent))
 
 
 @app.route('/')
 def index():
     services = zk.get_children('/services')
     return render_template('index.html', services=services)
+
 
 @app.route('/service/<string:service>', defaults={'env': None})
 @app.route('/service/<string:service>/<path:env>')
@@ -61,8 +63,8 @@ def service(service, env):
                            env=env,
                            children=children,
                            config=config,
-                           view=view,
-                           service=service)
+                           view=view)
+
 
 if __name__ == '__main__':
     app.run()

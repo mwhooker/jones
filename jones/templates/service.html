@@ -1,5 +1,11 @@
 {% extends "layout.html" %}
 {% set page_title = "Jones" %}
+{% block head %}
+
+<script>
+var config = {{ config | tojson |safe }};
+</script>
+{% endblock %}
 {% block body %}
 
 <h2>{{ service }}</h2>
@@ -29,6 +35,5 @@
         {% endfor %}
     </tbody>
 </table>
-<pre> {{ view | as_json(2)}}</pre>
-<pre> {{ config }}</pre>
+<pre>{{ view | as_json(2) }}</pre>
 {% endblock %}
