@@ -10,31 +10,34 @@ var config = {{ config | tojson |safe }};
 
 <h2>{{ service }}</h2>
 <h3>/{% if env %}{{env}}{% endif %}</h3>
-
-<table class="table table-bordered">
-    <tbody>
-        {% for child in children %}
-        {# TODO: doesn't work for root (/) #}
-        {% set ischild = (child[1:] == (env or '')) %}
-            <tr>
-                <td>
-                    {% if ischild%}
-                    <strong>
+<div class="row-fluid">
+    <div class="well span4">
+        <ul class="unstyled">
+            {% for child in children %}
+            {# TODO: doesn't work for root (/) #}
+            {% set ischild = (child[1:] == (env or '')) %}
+            <li>
+            {% if ischild%}
+            <strong>
+                {% endif %}
+                <a href="/service/{{ service }}{{ child }}">
+                    {% if child %}
+                    {{child}}
+                    {% else %}
+                    /
                     {% endif %}
-                    <a href="/service/{{ service }}{{ child }}">
-                        {% if child %}
-                        {{child}}
-                        {% else %}
-                        /
-                        {% endif %}
-                    </a>
-                    {% if ischild %}
-                    </strong>
-                    {% endif %}
-                </td>
-            </tr>
-        {% endfor %}
-    </tbody>
-</table>
-<pre>{{ view | as_json(2) }}</pre>
+                </a>
+                {% if ischild %}
+            </strong>
+            {% endif %}
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+<div class="row-fluid">
+    <div class="well span4">
+        <pre>{{ view | as_json(2) }}</pre>
+    </div>
+</div>
 {% endblock %}
