@@ -41,7 +41,7 @@ def as_json(d, indent=None):
     return Markup(json.dumps(d, indent=indent))
 
 
-@app.route('/')
+@app.route('/service')
 def index():
     services = zk.get_children('/services')
     return render_template('index.html', services=services)
@@ -59,7 +59,9 @@ def service(service, env):
                            env=env,
                            children=children,
                            config=config,
-                           view=view)
+                           view=view,
+                           service=service
+                          )
 
 
 if __name__ == '__main__':
