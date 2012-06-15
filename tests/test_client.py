@@ -40,8 +40,6 @@ class TestJonesClient(TestCase):
                                   self.hostname)
 
     def default_cb(self, config):
-        print "got new config"
-        print config
         self.config = config
 
     def tearDown(self):
@@ -57,11 +55,8 @@ class TestJonesClient(TestCase):
     def test_responds_to_remap(self):
         """test that changing the associations updates config properly."""
 
-        fixt = dict(fixture.CONFIG['root'])
-        fixt.update(fixture.CONFIG['parent'])
-
         self.jones.assoc_host(self.hostname, 'parent')
-        self.assertEquals(self.config, fixt)
+        self.assertEquals(self.config, fixture.PARENT)
 
     def test_defaults_to_root(self):
         """
@@ -70,6 +65,9 @@ class TestJonesClient(TestCase):
         host under our control to zk.
         """
         hostname = '0.0.0.0'
-        client = JonesClient(self.service, self.zk, self.default_cb, hostname)
+        self.client = JonesClient(self.service, self.zk,
+                             self.default_cb, hostname)
         self.assertTrue(hostname not in fixture.HOSTS)
         self.assertEquals(self.config, fixture.CONFIG['root'])
+        self.jones.assoc_host(hostname, 'parent')
+        self.assertEquals(self.config, fixture.PARENT)
