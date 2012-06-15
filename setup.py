@@ -30,6 +30,7 @@ if __name__ == '__main__':
         author_email='mwhooker@disqus.com',
         url='https://github.com/disqus/jones',
         description='Report tool for analytics.',
+        license='Apache License 2.0',
         packages=find_packages(exclude=['tests']),
         package_data={
             '': ['credentials.json']
