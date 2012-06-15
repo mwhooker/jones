@@ -13,28 +13,33 @@ var config = {{ config | tojson |safe }};
 <h3>/{% if env %}{{env}}{% endif %}</h3>
 <div class="container-fluid">
     <div class="row-fluid">
-        <div class="span4">
+        <div class="span4 well">
             <h4>Environments</h4>
-            <ul class="unstyled">
-                {% for child in children %}
-                {% set ischild = (child[1:] == (env or '')) %}
-                {% if child %}
+            <table class="env-table table table-condensed table-striped">
+                <tbody>
+                    {% for child in children %}
+                    {% set ischild = (child[1:] == (env or '')) %}
+                    {% if child %}
                     {% set child_pretty = child %}
-                {% else %}
+                    {% else %}
                     {% set child_pretty = "/" %}
-                {% endif %}
+                    {% endif %}
 
-                <li>
-                {% if ischild%}
-                <strong>{{ child_pretty }}</strong>
-                {% else %}
-                    <a href="/service/{{ service }}{{ child }}">
-                        {{ child_pretty }}
-                    </a>
-                {% endif %}
-                </li>
-                {% endfor %}
-            </ul>
+                    <tr>
+                        <!--<td>
+                            hi
+                        </td>-->
+                        <td>
+                            {% if ischild%}
+                            <strong>{{ child_pretty }}</strong>
+                            {% else %}
+                            <a href="/service/{{ service }}{{ child }}"><div>{{ child_pretty }}</div></a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
             <h4>Inherited View</h4>
             <pre>{{ view | as_json(2) }}</pre>
         </div>
