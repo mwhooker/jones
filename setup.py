@@ -23,15 +23,18 @@ NAME = 'jones'
 tests_require = [
     'nose',
     'unittest2',
-    'mock'
+    'mock',
+    'zope.testing'
 ]
 
 
 install_requires = [
+    'zc.zk',
     'flask',
-    'raven>=1.5.0',
+    'raven',
     'distribute',
     'Flask-OpenID',
+    'zkpython'
 ]
 
 
