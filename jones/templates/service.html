@@ -1,42 +1,68 @@
 {% extends "layout.html" %}
 {% set page_title = "Jones" %}
 {% block head %}
-
+<link rel=stylesheet href="{{ url_for('.static', filename='css/jsoneditor.css') }}">
 <script>
 var config = {{ config | tojson |safe }};
+
 </script>
 {% endblock %}
 {% block body %}
 
 <h2>{{ service }}</h2>
 <h3>/{% if env %}{{env}}{% endif %}</h3>
-<div class="row-fluid">
-    <div class="well span4">
-        <ul class="unstyled">
-            {% for child in children %}
-            {% set ischild = (child[1:] == (env or '')) %}
-            {% if child %}
-                {% set child_pretty = child %}
-            {% else %}
-                {% set child_pretty = "/" %}
-            {% endif %}
+<div class="container-fluid">
+    <div class="row-fluid">
+        <div class="span4">
+            <h4>Environments</h4>
+            <ul class="unstyled">
+                {% for child in children %}
+                {% set ischild = (child[1:] == (env or '')) %}
+                {% if child %}
+                    {% set child_pretty = child %}
+                {% else %}
+                    {% set child_pretty = "/" %}
+                {% endif %}
 
-            <li>
-            {% if ischild%}
-            <strong>{{ child_pretty }}</strong>
-            {% else %}
-                <a href="/service/{{ service }}{{ child }}">
-                    {{ child_pretty }}
-                </a>
-            {% endif %}
-            </li>
-            {% endfor %}
-        </ul>
+                <li>
+                {% if ischild%}
+                <strong>{{ child_pretty }}</strong>
+                {% else %}
+                    <a href="/service/{{ service }}{{ child }}">
+                        {{ child_pretty }}
+                    </a>
+                {% endif %}
+                </li>
+                {% endfor %}
+            </ul>
+            <h4>Inherited View</h4>
+            <pre>{{ view | as_json(2) }}</pre>
+        </div>
+        <div class="span8">
+            <div id="jsoneditor"></div>
+            <div id="jsonformatter"></div>
+            <button id="update">Update</button>
+        </div>
     </div>
 </div>
-<div class="row-fluid">
-    <div class="well span4">
-        <pre>{{ view | as_json(2) }}</pre>
-    </div>
-</div>
+{% endblock %}
+{% block footer %}
+<script src="{{ url_for('.static', filename='js/json2.js') }}"></script>
+<script src="{{ url_for('.static', filename='js/jsoneditor-min.js') }}"></script>
+<script>
+$(function() {
+    window.editor = new JSONEditor($('#jsoneditor')[0]);
+    window.editor.set(config);
+    $('#update').click(function() {
+        console.log(JSON.stringify(editor.get()));
+    });
+
+    /*
+    window.formatter = new JSONFormatter($('#jsonformatter')[0]);
+    window.formatter.set(config);
+    window.formatter.onError = console.log
+    */
+});
+</script>
+
 {% endblock %}
