@@ -15,7 +15,7 @@ limitations under the License.
 """
 
 
-from flask import Flask, render_template
+from flask import Flask, abort, render_template, request
 from raven.contrib.flask import Sentry
 from werkzeug.contrib.fixers import ProxyFix
 from jinja2 import Markup
@@ -47,12 +47,20 @@ def index():
     services = zk.get_children('/services')
     return render_template('index.html', services=services)
 
+def service_create(service, env, j):
 
-@app.route('/service/<string:service>', defaults={'env': None})
-@app.route('/service/<string:service>/<path:env>')
-def service(service, env):
-    j = Jones(service, zk)
+    j.create_config(env, {})
+    return "ok"
 
+
+def service_update(service, env, j):
+    pass
+
+def service_delete(service, env, j):
+    j.delete_config(env, -1)
+    return "ok"
+
+def service_get(service, env, j):
     children = j.get_child_envs('')
     config = j.get_config_by_env(env)[1]
     view = j.get_view_by_env(env)[1]
@@ -63,6 +71,25 @@ def service(service, env):
                            view=view,
                            service=service
                           )
+
+SERVICE = {
+    'get': service_get,
+    'put': service_update,
+    'post': service_create,
+    'delete': service_delete
+}
+
+ALL_METHODS = ['GET', 'PUT', 'POST', 'DELETE']
+
+@app.route('/service/<string:service>', defaults={'env': None},
+           methods=ALL_METHODS)
+@app.route('/service/<string:service>/<path:env>', methods=ALL_METHODS)
+def service(service, env):
+    j = Jones(service, zk)
+
+    print request.method
+    return SERVICE[request.method.lower()](service, env, j)
+
 
 
 if __name__ == '__main__':

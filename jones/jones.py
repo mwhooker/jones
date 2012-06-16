@@ -96,6 +96,12 @@ class Jones(object):
 
         propogate(env)
 
+    def delete_config(self, env, version):
+        self.zk.delete(
+            self._get_env_path(env),
+            version
+        )
+
     def get_config(self, hostname):
         """
         Returns a 2-tuple like (version, data).

@@ -8,6 +8,23 @@ var config = {{ config | tojson |safe }};
 </script>
 {% endblock %}
 {% block body %}
+<div class="modal hide" id="myModal">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal">×</button>
+    <h3>Add child</h3>
+    <h4></h4>
+  </div>
+  <div class="modal-body">
+      <form>
+          <label>Child</label>
+          <input type="text">
+      </form>
+  </div>
+  <div class="modal-footer">
+    <a href="#" class="btn" data-dismiss="modal">Close</a>
+    <a id="modalSubmit" href="#" class="btn btn-primary">Save changes</a>
+  </div>
+</div>
 
 <h2>{{ service }}</h2>
 <h3>/{% if env %}{{env}}{% endif %}</h3>
@@ -19,6 +36,7 @@ var config = {{ config | tojson |safe }};
                 <tbody>
                     {% for child in children %}
                     {% set ischild = (child[1:] == (env or '')) %}
+                    {% set child_url = "/service/%s%s"|format(service, child) %}
                     {% if child %}
                     {% set child_pretty = child %}
                     {% else %}
@@ -33,8 +51,14 @@ var config = {{ config | tojson |safe }};
                             {% if ischild%}
                             <strong>{{ child_pretty }}</strong>
                             {% else %}
-                            <a href="/service/{{ service }}{{ child }}"><div>{{ child_pretty }}</div></a>
+                            <a href="{{ child_url }}"><div>{{ child_pretty }}</div></a>
                             {% endif %}
+                        </td>
+                        <td>
+                            <a class="btn add-env btn-mini" href="{{ child_url }}">Add Child</a>
+                        </td>
+                        <td>
+                            <a class="btn del-env btn-mini" href="{{ child_url }}">Delete</a>
                         </td>
                     </tr>
                     {% endfor %}
@@ -55,11 +79,51 @@ var config = {{ config | tojson |safe }};
 <script src="{{ url_for('.static', filename='js/json2.js') }}"></script>
 <script src="{{ url_for('.static', filename='js/jsoneditor-min.js') }}"></script>
 <script>
+var addChildHeaderTpl = "Add child to ";
 $(function() {
     window.editor = new JSONEditor($('#jsoneditor')[0]);
     window.editor.set(config);
     $('#update').click(function() {
         console.log(JSON.stringify(editor.get()));
+    });
+
+
+    // TODO: backbone this. need to add it to the list.
+    $('.add-env').click(function() {
+        var input = $('#myModal input');
+        var href = $(this).attr('href');
+
+        $('#myModal').modal();
+        $('#myModal form').submit(function() {
+            $('#modalSubmit').click();
+        });
+        input.focus();
+        console.log(href);
+        $('#myModal .modal-header h4').text(href);
+        $('#modalSubmit').click(function() {
+            console.log(input.val());
+            console.log(href);
+
+            // TODO: validate no slashes
+            $.post(href + '/' + input.val(), {}, function () {
+                $('#myModal').toggle();
+                window.location.reload(true);
+            });
+        });
+        return false;
+    });
+
+    $('.del-env').click(function() {
+        var href = $(this).attr('href');
+
+        $.ajax({
+            url: href,
+            type: 'delete',
+            success: function() {
+                window.location.reload(true);
+            }
+        });
+        return false;
     });
 
     /*
