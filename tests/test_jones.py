@@ -106,3 +106,13 @@ class TestJones(TestCase):
         assocs = self.jones.get_associations()
         for env in fixture.ASSOCIATIONS:
             self.assertEquals(assocs[env], [fixture.ASSOCIATIONS[env]])
+
+    def test_delete_association(self):
+        fixture.init_tree(self.jones)
+        self.jones.delete_association('127.0.0.3')
+        self.assertRaises(
+            zookeeper.NoNodeException,
+            self.jones.get_config,
+            '127.0.0.3'
+        )
+        self.assertTrue(len(self.jones.get_associations()) > 0)

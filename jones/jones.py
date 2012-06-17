@@ -157,8 +157,13 @@ class Jones(object):
             hostname = keys[k][len(prefix):]
             assocs[hostname].append(k[:-3])
 
-        return assocs
+        return dict(assocs)
 
+    def delete_association(self, hostname):
+        keys, meta = self.zk.get(self.nodemap_path)
+        keys = json.loads(keys)
+        del keys['%s ->' % hostname]
+        self._set(self.nodemap_path, keys, meta['version'])
 
     def _flatten_to_root(self, env):
         """
