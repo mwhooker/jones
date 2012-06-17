@@ -104,6 +104,5 @@ class TestJones(TestCase):
     def test_get_associations(self):
         fixture.init_tree(self.jones)
         assocs = self.jones.get_associations()
-        self.assertEquals(assocs['parent'], ['127.0.0.1'])
-        self.assertEquals(assocs['parent/child1'], ['127.0.0.2'])
-
+        for env in fixture.ASSOCIATIONS:
+            self.assertEquals(assocs[env], [fixture.ASSOCIATIONS[env]])

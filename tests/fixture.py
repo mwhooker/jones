@@ -45,15 +45,20 @@ for k in ('root', 'parent'):
     PARENT.update(**CONFIG[k])
 
 
+ASSOCIATIONS = {
+    '': '127.0.0.3',
+    'parent': '127.0.0.1',
+    'parent/child1': '127.0.0.2'
+}
+
 def init_tree(jones):
     jones.create_config(None, CONFIG['root'])
     jones.create_config('parent', CONFIG['parent'])
     jones.create_config('parent/child1', CONFIG['child1'])
     jones.create_config('parent/child2', CONFIG['child2'])
     jones.create_config('parent/child1/subchild1', CONFIG['subchild1'])
-    jones.assoc_host('127.0.0.3', '')
-    jones.assoc_host('127.0.0.1', 'parent')
-    jones.assoc_host('127.0.0.2', 'parent/child1')
+    for env in ASSOCIATIONS:
+        jones.assoc_host(ASSOCIATIONS[env], env)
 
 
 HOST_TO_VIEW = {
