@@ -48,32 +48,30 @@ def index():
     services = zk.get_children('/services')
     return render_template('index.html', services=services)
 
-def service_create(service, env, j):
-
-    j.create_config(env, {})
+def service_create(env, jones):
+    jones.create_config(env, {})
     return "ok"
 
-
-def service_update(service, env, j):
+def service_update(env, jones):
     pass
 
-def service_delete(service, env, j):
-    j.delete_config(env, -1)
+def service_delete(env, jones):
+    jones.delete_config(env, -1)
     return "ok"
 
-def service_get(service, env, j):
-    children = list(j.get_child_envs())
+def service_get(env, jones):
+    children = list(jones.get_child_envs())
     is_leaf = lambda child: not any(
         [c.find(child + '/') >= 0 for c in children])
 
-    config = j.get_config_by_env(env)[1]
-    view = j.get_view_by_env(env)[1]
+    config = jones.get_config_by_env(env)[1]
+    view = jones.get_view_by_env(env)[1]
     return render_template('service.html',
                            env=env,
                            children=zip(children, map(is_leaf, children)),
                            config=config,
                            view=view,
-                           service=service
+                           service=jones.service
                           )
 
 SERVICE = {
@@ -89,10 +87,10 @@ ALL_METHODS = ['GET', 'PUT', 'POST', 'DELETE']
            methods=ALL_METHODS)
 @app.route('/service/<string:service>/<path:env>', methods=ALL_METHODS)
 def service(service, env):
-    j = Jones(service, zk)
+    jones = Jones(service, zk)
 
     print request.method
-    return SERVICE[request.method.lower()](service, env, j)
+    return SERVICE[request.method.lower()](env, jones)
 
 
 
