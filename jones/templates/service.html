@@ -76,6 +76,8 @@ var config = {{ config | tojson |safe }};
                             data-loading-text="Deleting...">Delete</button>
                     </span>
                     </li>
+                    {% else %}
+                    <li>None</li>
                     {% endfor %}
                 </ul>
                 <div class="hide" id="add-assoc">

@@ -11,15 +11,4 @@
    * add tooltips to inherited view and associations.
    * warn user if their update failed because of version conflict
       * preserve user's changes
-   * use back-bone so we don't lose settings during page reload
-   * refactor URLs (see below)
-
-
-# URLS
-/service - service list
-/service/<service> - service root
-/service/<service>/<env> - env view
-/service/<service>/association/<assoc>
-    GET assoc map
-    PUT <map> update assoc map
-    DELTE del assoc map
+   * use backbone.js so we don't lose settings during page reload
