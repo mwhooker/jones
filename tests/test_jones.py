@@ -94,7 +94,26 @@ class TestJones(TestCase):
             None, {"foo": "bag"}, 4,
         )
 
+    def test_delete_config(self):
+        fixture.init_tree(self.jones)
+        env = 'parent/child2'
+        self.jones.delete_config(env, -1)
+
+        self.assertRaises(
+            zookeeper.NoNodeException,
+            self.jones.get_config_by_env,
+            env
+        )
+
+        self.assertRaises(
+            zookeeper.NoNodeException,
+            self.jones.get_view_by_env,
+            env
+        )
+
     def test_conf_is_mapping(self):
+        """Make sure create_config only allows collections.Mapping types"""
+
         self.assertRaises(
             ValueError,
             self.jones.create_config,

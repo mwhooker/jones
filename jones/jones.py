@@ -103,6 +103,11 @@ class Jones(object):
             version
         )
 
+        self.zk.delete(
+            self._get_view_path(env),
+            -1
+        )
+
     def get_config(self, hostname):
         """
         Returns a 2-tuple like (version, data).
