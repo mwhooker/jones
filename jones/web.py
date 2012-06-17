@@ -62,7 +62,7 @@ def service_update(env, jones):
 
 def service_delete(env, jones):
     jones.delete_config(env, -1)
-    return redirect(url_for('service', service=jones.service))
+    return env, 200
 
 def service_get(env, jones):
     children = list(jones.get_child_envs())
@@ -76,7 +76,7 @@ def service_get(env, jones):
 
     view = jones.get_view_by_env(env)[1]
     return render_template('service.html',
-                           env=env,
+                           env=env or '',
                            version=version,
                            children=zip(children, map(is_leaf, children)),
                            config=config,
