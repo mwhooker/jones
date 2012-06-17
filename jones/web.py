@@ -15,13 +15,13 @@ limitations under the License.
 """
 
 
-from flask import Flask, abort, render_template, request
+from flask import Flask, redirect, render_template, request, url_for
 from raven.contrib.flask import Sentry
 from werkzeug.contrib.fixers import ProxyFix
 from jinja2 import Markup
-import itertools
 import json
 import zc.zk
+import zookeeper
 
 from jones import Jones
 import jonesconfig
@@ -62,14 +62,18 @@ def service_update(env, jones):
 
 def service_delete(env, jones):
     jones.delete_config(env, -1)
-    return env
+    return redirect(url_for('service', service=jones.service))
 
 def service_get(env, jones):
     children = list(jones.get_child_envs())
     is_leaf = lambda child: not any(
         [c.find(child + '/') >= 0 for c in children])
 
-    version, config = jones.get_config_by_env(env)
+    try:
+        version, config = jones.get_config_by_env(env)
+    except zookeeper.NoNodeException:
+        return redirect(url_for('service', service=jones.service))
+
     view = jones.get_view_by_env(env)[1]
     return render_template('service.html',
                            env=env,
