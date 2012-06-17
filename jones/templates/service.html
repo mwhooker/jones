@@ -34,7 +34,7 @@ var config = {{ config | tojson |safe }};
             <h4>Environments</h4>
             <table class="env-table table table-condensed table-striped">
                 <tbody>
-                    {% for child in children %}
+                    {% for child, is_leaf in children %}
                     {% set ischild = (child[1:] == (env or '')) %}
                     {% set child_url = "/service/%s%s"|format(service, child) %}
                     {% if child %}
@@ -44,21 +44,20 @@ var config = {{ config | tojson |safe }};
                     {% endif %}
 
                     <tr>
-                        <!--<td>
-                            hi
-                        </td>-->
                         <td>
                             {% if ischild%}
-                            <strong>{{ child_pretty }}</strong>
+                            <span><strong>{{ child_pretty }}</strong></span>
                             {% else %}
-                            <a href="{{ child_url }}"><div>{{ child_pretty }}</div></a>
+                            <a href="{{ child_url }}"><span>{{ child_pretty }}</span></a>
                             {% endif %}
-                        </td>
-                        <td>
-                            <a class="btn add-env btn-mini" href="{{ child_url }}">Add Child</a>
-                        </td>
-                        <td>
-                            <a class="btn del-env btn-mini" href="{{ child_url }}">Delete</a>
+                            <span style="float:right;">
+                                {% if is_leaf %}
+                                <a class="btn del-env btn-mini" href="{{ child_url }}">Delete</a>
+                                {% endif %}
+                                <a class="btn add-env btn-mini"
+                                    {#data-toggle="modal" data-target='#myModal'#}
+                                    href="{{ child_url }}">Add Child</a>
+                            </span>
                         </td>
                     </tr>
                     {% endfor %}
@@ -87,30 +86,35 @@ $(function() {
         console.log(JSON.stringify(editor.get()));
     });
 
+    $('#myModal form').submit(function() {
+        $('#modalSubmit').click();
+        return false;
+    });
 
-    // TODO: backbone this. need to add it to the list.
     $('.add-env').click(function() {
         var input = $('#myModal input');
         var href = $(this).attr('href');
 
+        $('#myModal .modal-header h4').text(href);
         $('#myModal').modal();
-        $('#myModal form').submit(function() {
-            $('#modalSubmit').click();
-        });
         input.focus();
         console.log(href);
-        $('#myModal .modal-header h4').text(href);
         $('#modalSubmit').click(function() {
             console.log(input.val());
             console.log(href);
 
             // TODO: validate no slashes
             $.post(href + '/' + input.val(), {}, function () {
-                $('#myModal').toggle();
+                $('#myModal').modal('hide');
                 window.location.reload(true);
             });
+            return false;
         });
         return false;
+    });
+
+    $('#myModal').on('hide', function () {
+        $('#modalSubmit').unbind('click');
     });
 
     $('.del-env').click(function() {

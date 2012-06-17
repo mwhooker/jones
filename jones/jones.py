@@ -122,7 +122,7 @@ class Jones(object):
             self._get_view_path(env)
         )
 
-    def get_child_envs(self, env):
+    def get_child_envs(self, env=None):
         prefix = self._get_env_path(env)
         envs = self.zk.walk(prefix)
         return itertools.imap(lambda e: e[len(prefix):], envs)

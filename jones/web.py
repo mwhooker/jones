@@ -19,6 +19,7 @@ from flask import Flask, abort, render_template, request
 from raven.contrib.flask import Sentry
 from werkzeug.contrib.fixers import ProxyFix
 from jinja2 import Markup
+import itertools
 import json
 import zc.zk
 
@@ -61,12 +62,15 @@ def service_delete(service, env, j):
     return "ok"
 
 def service_get(service, env, j):
-    children = j.get_child_envs('')
+    children = list(j.get_child_envs())
+    is_leaf = lambda child: not any(
+        [c.find(child + '/') >= 0 for c in children])
+
     config = j.get_config_by_env(env)[1]
     view = j.get_view_by_env(env)[1]
     return render_template('service.html',
                            env=env,
-                           children=children,
+                           children=zip(children, map(is_leaf, children)),
                            config=config,
                            view=view,
                            service=service
