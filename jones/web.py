@@ -81,7 +81,8 @@ def service_get(env, jones):
                            children=zip(children, map(is_leaf, children)),
                            config=config,
                            view=view,
-                           service=jones.service
+                           service=jones.service,
+                           associations=jones.get_associations()
                           )
 
 SERVICE = {
