@@ -117,6 +117,11 @@ def association(service, assoc):
         return service, 200
 
 
+@app.route('/backup/<path:zkpath>', defaults={'zkpath': ''})
+@app.route('/backup', defaults={'zkpath': ''})
+def backup(zkpath):
+    return zk.export_tree('/' + zkpath)
+
 
 if __name__ == '__main__':
     app.run()
