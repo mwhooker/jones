@@ -1,7 +1,8 @@
 # TODO
    * Add versions to services controller. (DONE)
    * Implement update. (DONE)
-   * fuck modals. just drop a textinput below the li/tr (DO NEXT)
+   * fuck modals. just drop a textinput below the li/tr (DONE)
+   * Mechanism for creating new services. (NEXT)
    * Log every action so we can recreate incase of accident.
    * Prompt user for confirmation before deleting node.
    * validate node name client-side before accepting creation.
@@ -11,3 +12,14 @@
    * warn user if their update failed because of version conflict
       * preserve user's changes
    * use back-bone so we don't lose settings during page reload
+   * refactor URLs (see below)
+
+
+# URLS
+/service - service list
+/service/<service> - service root
+/service/<service>/<env> - env view
+/service/<service>/association/<assoc>
+    GET assoc map
+    PUT <map> update assoc map
+    DELTE del assoc map

@@ -67,17 +67,18 @@ $(function() {
 
         $('#add-assoc').show();
         $('#add-assoc .btn').click(function() {
-            var href = '/association/' + $('#add-assoc input').val();
-            href += '/' + service + '/' + env;
+            var href = '/service/' + service;
+            href += '/association/' + $('#add-assoc input').val();
 
             $(this).button('loading');
 
             $.ajax({
-                url: href,
-                type: 'post',
-                success: function() {
-                    window.location.reload(true);
-                }
+              url: href,
+              data: {env: env},
+              type: 'post',
+              success: function() {
+                window.location.reload(true);
+              }
             });
         });
         return false;
@@ -85,8 +86,8 @@ $(function() {
 
     $('#associations .del-assoc').click(function() {
       $(this).button('loading');
-      var href = '/association/' + $(this).data('hostname');
-      href += '/' + service + '/' + env;
+      var href = '/service/' + service;
+      href += '/association/' + $(this).data('hostname');
 
       $.ajax({
         url: href,

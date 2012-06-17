@@ -104,15 +104,13 @@ def service(service, env):
     return SERVICE[request.method.lower()](env, jones)
 
 
-@app.route('/association/<string:assoc>/<string:service>',
-           defaults={'env': None}, methods=['POST', 'DELETE'])
-@app.route('/association/<string:assoc>/<string:service>/<path:env>',
+@app.route('/service/<string:service>/association/<string:assoc>',
            methods=['POST', 'DELETE'])
-def association(assoc, service, env):
+def association(service, assoc):
     jones = Jones(service, zk)
 
     if request.method == 'POST':
-        jones.assoc_host(assoc, env)
+        jones.assoc_host(assoc, request.form['env'])
         return service, 201
     elif request.method == 'DELETE':
         jones.delete_association(assoc)

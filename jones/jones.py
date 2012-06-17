@@ -48,9 +48,6 @@ class Jones(object):
         self._get_env_path = partial(self._get_path_by_env, self.conf_path)
         self._get_view_path = partial(self._get_path_by_env, self.view_path)
 
-        for k in (self.view_path, self.nodemap_path):
-            self.zk.create_recursive(k, '', zc.zk.OPEN_ACL_UNSAFE)
-
     def create_config(self, env, conf):
         """
         Set conf to env under service.
@@ -60,6 +57,9 @@ class Jones(object):
 
         if not isinstance(conf, collections.Mapping):
             raise ValueError("conf must be a collections.Mapping")
+
+        for k in (self.view_path, self.nodemap_path):
+            self.zk.create_recursive(k, '', zc.zk.OPEN_ACL_UNSAFE)
 
         self.zk.create(
             self._get_env_path(env),
