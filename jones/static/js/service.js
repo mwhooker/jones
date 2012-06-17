@@ -75,7 +75,7 @@ $(function() {
             $.ajax({
               url: href,
               data: {env: env},
-              type: 'post',
+              type: 'put',
               success: function() {
                 window.location.reload(true);
               }

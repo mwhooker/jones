@@ -94,6 +94,7 @@ SERVICE = {
 
 ALL_METHODS = ['GET', 'PUT', 'POST', 'DELETE']
 
+
 @app.route('/service/<string:service>', defaults={'env': None},
            methods=ALL_METHODS)
 @app.route('/service/<string:service>/<path:env>', methods=ALL_METHODS)
@@ -105,11 +106,11 @@ def service(service, env):
 
 
 @app.route('/service/<string:service>/association/<string:assoc>',
-           methods=['POST', 'DELETE'])
+           methods=['PUT', 'DELETE'])
 def association(service, assoc):
     jones = Jones(service, zk)
 
-    if request.method == 'POST':
+    if request.method == 'PUT':
         jones.assoc_host(assoc, request.form['env'])
         return service, 201
     elif request.method == 'DELETE':
