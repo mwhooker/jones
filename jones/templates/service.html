@@ -79,16 +79,10 @@ var config = {{ config | tojson |safe }};
                     {% endfor %}
                 </ul>
                 <div class="hide" id="add-assoc">
-                    <form class="form-horizontal">
-                        <fieldset>
-                            <div class="control-group">
-                                <input type="text" class="input-medium" id="hostname">
-                                <button type="submit" class="btn btn-mini pull-right"
-                                    data-loading-text="Associating...">
-                                    Associate</button>
-                            </div>
-                        </fieldset>
-                    </form>
+                    <input type="text" class="input-medium" id="hostname">
+                    <button type="submit" class="btn btn-mini pull-right"
+                        data-loading-text="Associating...">
+                        Associate</button>
                 </div>
                 <button autocomplete="off" class="btn btn-mini">Add</button>
             </div>
