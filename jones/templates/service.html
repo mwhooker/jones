@@ -16,8 +16,10 @@ var config = {{ config | tojson |safe }};
   </div>
   <div class="modal-body">
       <form>
-          <label>Child</label>
-          <input type="text">
+          <fieldset>
+              <label>Child</label>
+              <input type="text">
+          </fieldset>
       </form>
   </div>
   <div class="modal-footer">
@@ -51,7 +53,7 @@ var config = {{ config | tojson |safe }};
                             {# TODO: link span shoud go all the way to buttons. #}
                             <a href="{{ child_url }}"><span>{{ child_pretty }}</span></a>
                             {% endif %}
-                            <span style="float:right;">
+                            <span class="pull-right">
                                 {% if is_leaf %}
                                 <a class="btn del-env btn-mini" href="{{ child_url }}">Delete</a>
                                 {% endif %}
@@ -64,102 +66,53 @@ var config = {{ config | tojson |safe }};
             </table>
 
             <h4>Associations</h4>
-            <ul class="unstyled">
-                {% for ip in associations[env] %}
-                <li>{{ ip }}
-                <span style="float:right;">
-                    <a class="btn btn-mini" href="#">Delete</a>
-                </span></li>
-                {% endfor %}
-                <a class="btn btn-mini" href="#">Add</a>
-            </ul>
+            <div class="well" id="associations">
+                <ul class="unstyled">
+                    {% for ip in associations[env] %}
+                    <li style="padding: 2px;">
+                    <span>{{ ip }}</span>
+                    <span class="pull-right">
+                        <button class="btn btn-mini del-assoc" data-hostname="{{ ip }}"
+                            data-loading-text="Deleting...">Delete</button>
+                    </span>
+                    </li>
+                    {% endfor %}
+                </ul>
+                <div class="hide" id="add-assoc">
+                    <form class="form-horizontal">
+                        <fieldset>
+                            <div class="control-group">
+                                <input type="text" class="input-medium" id="hostname">
+                                <button type="submit" class="btn btn-mini pull-right"
+                                    data-loading-text="Associating...">
+                                    Associate</button>
+                            </div>
+                        </fieldset>
+                    </form>
+                </div>
+                <button autocomplete="off" class="btn btn-mini">Add</button>
+            </div>
 
             <h4>Inherited View</h4>
             <pre>{{ view | as_json(2) }}</pre>
         </div>
+
         <div class="span8">
             <div id="jsoneditor"></div>
             <div id="jsonformatter"></div>
-            <button id="update">Update</button>
+            <button class="btn" id="update">Update</button>
         </div>
     </div>
 </div>
 {% endblock %}
 {% block footer %}
+<script>
+    var version = {{ version }};
+    var env = '{{ env }}';
+    var service = '{{ service }}';
+</script>
 <script src="{{ url_for('.static', filename='js/json2.js') }}"></script>
 <script src="{{ url_for('.static', filename='js/jsoneditor-min.js') }}"></script>
-<script>
-var addChildHeaderTpl = "Add child to ";
-$(function() {
-    var version = {{ version }};
-    window.editor = new JSONEditor($('#jsoneditor')[0]);
-    window.editor.set(config);
-    $('#update').click(function() {
-        console.log(JSON.stringify(editor.get()));
-        $.ajax({
-            url: window.location.href,
-            data: {
-                data: JSON.stringify(editor.get()),
-                version: version
-            },
-            type: 'put',
-            success: function() {
-                window.location.reload(true);
-            }
-        });
-    });
-
-    $('#addChildModal form').submit(function() {
-        $('#modalSubmit').click();
-        return false;
-    });
-
-    $('.add-env').click(function() {
-        var input = $('#addChildModal input');
-        var href = $(this).attr('href');
-
-        $('#addChildModal .modal-header h4').text(href);
-        $('#addChildModal').modal();
-        input.focus();
-        console.log(href);
-        $('#modalSubmit').click(function() {
-            console.log(input.val());
-            console.log(href);
-
-            // TODO: validate no slashes
-            $.post(href + '/' + input.val(), {}, function () {
-                $('#addChildModal').modal('hide');
-                window.location.reload(true);
-            });
-            return false;
-        });
-        return false;
-    });
-
-    $('#addChildModal').on('hide', function () {
-        $('#modalSubmit').unbind('click');
-    });
-
-    // TODO: confirm delete.
-    $('.del-env').click(function() {
-        var href = $(this).attr('href');
-
-        $.ajax({
-            url: href,
-            type: 'delete',
-            success: function() {
-                window.location.reload(true);
-            }
-        });
-        return false;
-    });
-
-    /*
-    window.formatter = new JSONFormatter($('#jsonformatter')[0]);
-    window.formatter.set(config);
-    window.formatter.onError = console.log
-    */
-});
-</script>
+<script src="{{ url_for('.static', filename='js/service.js') }}"></script>
 
 {% endblock %}
