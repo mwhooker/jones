@@ -50,24 +50,30 @@ def index():
 
 def service_create(env, jones):
     jones.create_config(env, {})
-    return "ok"
+    return env, 201
 
 def service_update(env, jones):
-    pass
+    jones.set_config(
+        env,
+        json.loads(request.form['data']),
+        int(request.form['version'])
+    )
+    return env
 
 def service_delete(env, jones):
     jones.delete_config(env, -1)
-    return "ok"
+    return env
 
 def service_get(env, jones):
     children = list(jones.get_child_envs())
     is_leaf = lambda child: not any(
         [c.find(child + '/') >= 0 for c in children])
 
-    config = jones.get_config_by_env(env)[1]
+    version, config = jones.get_config_by_env(env)
     view = jones.get_view_by_env(env)[1]
     return render_template('service.html',
                            env=env,
+                           version=version,
                            children=zip(children, map(is_leaf, children)),
                            config=config,
                            view=view,

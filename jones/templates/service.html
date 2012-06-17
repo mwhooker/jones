@@ -80,10 +80,22 @@ var config = {{ config | tojson |safe }};
 <script>
 var addChildHeaderTpl = "Add child to ";
 $(function() {
+    var version = {{ version }};
     window.editor = new JSONEditor($('#jsoneditor')[0]);
     window.editor.set(config);
     $('#update').click(function() {
         console.log(JSON.stringify(editor.get()));
+        $.ajax({
+            url: window.location.href,
+            data: {
+                data: JSON.stringify(editor.get()),
+                version: version
+            },
+            type: 'put',
+            success: function() {
+                window.location.reload(true);
+            }
+        });
     });
 
     $('#addChildModal form').submit(function() {
