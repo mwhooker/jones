@@ -71,7 +71,7 @@ class TestJones(TestCase):
         self.jones.set_config('parent', parent, 0)
         #self.zk.print_tree('/services')
 
-        for i in fixture.HOSTS:
+        for i in ('127.0.0.1', '127.0.0.2'):
             _, config = self.jones.get_config(i)
             self.assertEquals(config.get('b'), [1, 2, 3],
                              "Host %s didn't inherit properly." % i)
@@ -100,3 +100,10 @@ class TestJones(TestCase):
             self.jones.create_config,
             None, 'hello'
         )
+
+    def test_get_associations(self):
+        fixture.init_tree(self.jones)
+        assocs = self.jones.get_associations()
+        self.assertEquals(assocs['parent'], ['127.0.0.1'])
+        self.assertEquals(assocs['parent/child1'], ['127.0.0.2'])
+

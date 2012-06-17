@@ -62,6 +62,11 @@ var config = {{ config | tojson |safe }};
                 {% endfor %}
                 </tbody>
             </table>
+            <h4>Associations</h4>
+            <ul class="unstyled">
+                {% for association in associations %}
+                <li>{{ association }}</li>
+            </ul>
             <h4>Inherited View</h4>
             <pre>{{ view | as_json(2) }}</pre>
         </div>

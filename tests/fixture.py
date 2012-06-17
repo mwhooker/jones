@@ -14,6 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
+
+# TODO: rewrite tests so we test everything
 CONFIG = {
     'parent': {
         'a': 1,
@@ -49,8 +51,13 @@ def init_tree(jones):
     jones.create_config('parent/child1', CONFIG['child1'])
     jones.create_config('parent/child2', CONFIG['child2'])
     jones.create_config('parent/child1/subchild1', CONFIG['subchild1'])
+    jones.assoc_host('127.0.0.3', '')
     jones.assoc_host('127.0.0.1', 'parent')
     jones.assoc_host('127.0.0.2', 'parent/child1')
 
 
-HOSTS = ('127.0.0.1', '127.0.0.2')
+HOST_TO_VIEW = {
+    '127.0.0.1': CHILD1,
+    '127.0.0.2': PARENT,
+    '127.0.0.3': CONFIG['root']
+}

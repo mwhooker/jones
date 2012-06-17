@@ -19,6 +19,7 @@ import itertools
 import json
 import zc.zk
 from functools import partial
+from collections import defaultdict
 
 
 class Jones(object):
@@ -44,8 +45,8 @@ class Jones(object):
         self.view_path = "%s/views" % self.root
         self.nodemap_path = "%s/nodemaps" % self.root
 
-        self._get_env_path = partial(self._get_path, self.conf_path)
-        self._get_view_path = partial(self._get_path, self.view_path)
+        self._get_env_path = partial(self._get_path_by_env, self.conf_path)
+        self._get_view_path = partial(self._get_path_by_env, self.view_path)
 
         for k in (self.view_path, self.nodemap_path):
             self.zk.create_recursive(k, '', zc.zk.OPEN_ACL_UNSAFE)
@@ -140,6 +141,25 @@ class Jones(object):
             self._get_nodemap_path(hostname)
         )
 
+    def get_associations(self):
+        """
+        Get all the associations in this service.
+
+        returns a map of environments to hostnames.
+        """
+
+        assocs = defaultdict(list)
+        keys, meta = self.zk.get(self.nodemap_path)
+        keys = json.loads(keys)
+        for k in keys:
+            assert k[-3:] == ' ->'
+            prefix = self.view_path + '/'
+            hostname = keys[k][len(prefix):]
+            assocs[hostname].append(k[:-3])
+
+        return assocs
+
+
     def _flatten_to_root(self, env):
         """
         Flatten values from root down in to new view.
@@ -176,7 +196,7 @@ class Jones(object):
     def _get_nodemap_path(self, hostname):
         return "%s/%s" % (self.nodemap_path, hostname)
 
-    def _get_path(self, prefix, env):
+    def _get_path_by_env(self, prefix, env):
         if not env:
             return prefix
         assert env[0] != '/'
