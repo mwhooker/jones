@@ -8,7 +8,7 @@ var config = {{ config | tojson |safe }};
 </script>
 {% endblock %}
 {% block body %}
-<div class="modal hide" id="myModal">
+<div class="modal hide" id="addChildModal">
   <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal">×</button>
     <h3>Add child</h3>
@@ -55,7 +55,7 @@ var config = {{ config | tojson |safe }};
                                 <a class="btn del-env btn-mini" href="{{ child_url }}">Delete</a>
                                 {% endif %}
                                 <a class="btn add-env btn-mini"
-                                    {#data-toggle="modal" data-target='#myModal'#}
+                                    {#data-toggle="modal" data-target='#addChildModal'#}
                                     href="{{ child_url }}">Add Child</a>
                             </span>
                         </td>
@@ -86,17 +86,17 @@ $(function() {
         console.log(JSON.stringify(editor.get()));
     });
 
-    $('#myModal form').submit(function() {
+    $('#addChildModal form').submit(function() {
         $('#modalSubmit').click();
         return false;
     });
 
     $('.add-env').click(function() {
-        var input = $('#myModal input');
+        var input = $('#addChildModal input');
         var href = $(this).attr('href');
 
-        $('#myModal .modal-header h4').text(href);
-        $('#myModal').modal();
+        $('#addChildModal .modal-header h4').text(href);
+        $('#addChildModal').modal();
         input.focus();
         console.log(href);
         $('#modalSubmit').click(function() {
@@ -105,7 +105,7 @@ $(function() {
 
             // TODO: validate no slashes
             $.post(href + '/' + input.val(), {}, function () {
-                $('#myModal').modal('hide');
+                $('#addChildModal').modal('hide');
                 window.location.reload(true);
             });
             return false;
@@ -113,7 +113,7 @@ $(function() {
         return false;
     });
 
-    $('#myModal').on('hide', function () {
+    $('#addChildModal').on('hide', function () {
         $('#modalSubmit').unbind('click');
     });
 
