@@ -56,13 +56,6 @@ def init_tree(jones):
     jones.create_config('parent', CONFIG['parent'])
     jones.create_config('parent/child1', CONFIG['child1'])
     jones.create_config('parent/child2', CONFIG['child2'])
-    jones.create_config('parent/child1/subchild1', CONFIG['subchild1'])
+    jones.create_config('parent/child2/subchild1', CONFIG['subchild1'])
     for env in ASSOCIATIONS:
         jones.assoc_host(ASSOCIATIONS[env], env)
-
-
-HOST_TO_VIEW = {
-    '127.0.0.1': CHILD1,
-    '127.0.0.2': PARENT,
-    '127.0.0.3': CONFIG['root']
-}

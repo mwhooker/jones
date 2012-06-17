@@ -69,7 +69,7 @@ class TestJonesClient(TestCase):
         hostname = '0.0.0.0'
         self.client = JonesClient(self.service, self.zk,
                              self.default_cb, hostname)
-        self.assertTrue(hostname not in fixture.HOST_TO_VIEW)
+        self.assertTrue(hostname not in fixture.ASSOCIATIONS.values())
         self.assertEquals(self.config, fixture.CONFIG['root'])
         self.jones.assoc_host(hostname, 'parent')
         self.assertEquals(self.config, fixture.PARENT)

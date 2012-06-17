@@ -96,8 +96,14 @@ class TestJones(TestCase):
 
     def test_delete_config(self):
         fixture.init_tree(self.jones)
-        env = 'parent/child2'
+        env = 'parent/child1'
         self.jones.delete_config(env, -1)
+
+        self.assertRaises(
+            zookeeper.NoNodeException,
+            self.jones.get_config,
+            '127.0.0.2'
+        )
 
         self.assertRaises(
             zookeeper.NoNodeException,
@@ -109,6 +115,14 @@ class TestJones(TestCase):
             zookeeper.NoNodeException,
             self.jones.get_view_by_env,
             env
+        )
+
+    def test_cannot_associate_to_nonexistant_env(self):
+        fixture.init_tree(self.jones)
+        self.assertRaises(
+            zookeeper.NoNodeException,
+            self.jones.assoc_host,
+            'abc', 'foobar'
         )
 
     def test_conf_is_mapping(self):

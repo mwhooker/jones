@@ -17,6 +17,7 @@ limitations under the License.
 import collections
 import itertools
 import json
+import zookeeper
 import zc.zk
 from functools import partial
 from collections import defaultdict
@@ -141,8 +142,12 @@ class Jones(object):
         Any string which uniquely identifies a host is acceptable.
         """
 
+        dest = self._get_view_path(env)
+        if not self.zk.exists(dest):
+            raise zookeeper.NoNodeException
+
         self.zk.ln(
-            self._get_view_path(env),
+            dest,
             self._get_nodemap_path(hostname)
         )
 
