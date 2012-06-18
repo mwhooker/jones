@@ -1,3 +1,8 @@
+{% set navigation_bar = [
+    ('/', 'index', 'Home'),
+    ('/service', 'service', 'Services'),
+] -%}
+{% set active_page = active_page|default('index') -%}
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -7,6 +12,7 @@
 
     <link rel=stylesheet href="{{ url_for('.static', filename='css/bootstrap.css') }}">
     <link rel=stylesheet href="{{ url_for('.static', filename='css/bootstrap-responsive.css') }}">
+    <link rel=stylesheet href="{{ url_for('.static', filename='css/global.css') }}">
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
     {% block head %}{% endblock %}
 
@@ -14,12 +20,24 @@
 
   <body>
 
-    <div class="container">
+    <div class="navbar navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <a class="brand" href="#">Jones</a>
+          <div class="nav-collapse">
+            <ul class="nav">
+             {% for href, id, caption in navigation_bar %}
+                <li{% if id == active_page %} class="active"{% endif %}>
+                  <a href="{{ href|e }}">{{ caption|e }}</a>
+                </li>
+              {% endfor %}
+            </ul>
+          </div><!--/.nav-collapse -->
+        </div>
+      </div>
+    </div>
 
-        <header class="subhead" id="overview">
-          <h1>{{ page_title }}</h1>
-          {% block header %}{% endblock header %}
-        </header>
+    <div class="container">
 
         {% with messages = get_flashed_messages() %}
           {% if messages %}
@@ -39,7 +57,6 @@
 
     <script src="{{ url_for('.static', filename='js/jquery-1.7.2.min.js') }}"></script>
     <script src="{{ url_for('.static', filename='js/bootstrap.min.js') }}"></script>
-    <script src="{{ url_for('.static', filename='js/underscore-min.js') }}"></script>
     {% block footer %}{% endblock %}
 
   </body>
