@@ -28,7 +28,7 @@ var config = {{ config | tojson |safe }};
   </div>
 </div>
 
-<h2>{{ service }}</h2>
+<h2><a href="/service/{{ service }}">{{ service }}</a></h2>
 <h3>/{% if env %}{{env}}{% endif %}</h3>
 <div class="container-fluid">
     <div class="row-fluid">
