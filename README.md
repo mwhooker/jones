@@ -12,4 +12,4 @@ Goals
 
 Screenshot
 ----------
-![Example](https://disqus.github.com/jones/docs/img/testservice.png)
+![Example](http://code.disqus.com/jones/docs/img/testservice.png)
