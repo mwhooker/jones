@@ -42,11 +42,13 @@ zk = zc.zk.ZooKeeper(app.config['ZK_CONNECTION_STRING'])
 def as_json(d, indent=None):
     return Markup(json.dumps(d, indent=indent))
 
+@app.context_processor
+def inject_services():
+    return dict(services=zk.get_children('/services'))
 
-@app.route('/service')
+@app.route('/')
 def index():
-    services = zk.get_children('/services')
-    return render_template('index.html', services=services)
+    return render_template('index.html')
 
 def service_create(env, jones):
     jones.create_config(env, {})
