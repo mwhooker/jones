@@ -20,20 +20,18 @@ from setuptools import setup, find_packages
 VERSION = '0.1'
 NAME = 'jones'
 
-tests_require = [
-    'nose',
-    'unittest2',
-    'mock',
-    'zope.testing'
-]
-
-
 install_requires = [
     'flask',
     'zc-zookeeper-static',
     'zc.zk'
 ]
 
+tests_require = install_requires + [
+    'nose',
+    'unittest2',
+    'mock',
+    'zope.testing'
+]
 
 if __name__ == '__main__':
     setup(
