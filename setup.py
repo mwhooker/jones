@@ -35,9 +35,6 @@ install_requires = [
 
 
 if __name__ == '__main__':
-    import distribute_setup
-    distribute_setup.use_setuptools()
-
     setup(
         name=NAME,
         version=VERSION,
