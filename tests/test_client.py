@@ -20,7 +20,7 @@ import zc.zk
 from zc.zk import testing
 
 from tests import fixture
-from jones import Jones
+from jones.jones import Jones
 from jones.client import JonesClient
 
 

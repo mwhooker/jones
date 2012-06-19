@@ -23,7 +23,7 @@ from tests import fixture
 from unittest import TestCase
 from zc.zk import testing
 
-from jones import Jones
+from jones.jones import Jones
 
 
 class TestJones(TestCase):
