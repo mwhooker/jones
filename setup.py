@@ -29,12 +29,8 @@ tests_require = [
 
 
 install_requires = [
-    'zc.zk',
     'flask',
-    'raven',
-    'distribute',
-    'Flask-OpenID',
-    'zkpython'
+    'zc-zookeeper-static'
 ]
 
 
@@ -46,7 +42,7 @@ if __name__ == '__main__':
         name=NAME,
         version=VERSION,
         author='Matthew Hooker',
-        author_email='mwhooker@disqus.com',
+        author_email='mwhooker@gmail.com',
         url='https://github.com/disqus/jones',
         description='Report tool for analytics.',
         license='Apache License 2.0',
