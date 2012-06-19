@@ -1,7 +1,8 @@
 jones
 =====
 
-![travis]( https://secure.travis-ci.org/disqus/jones.png?branch=master)
+[![travis][2]][1]
+
 Jones is a configuration frontend for Zookeeper.
 
 Goals
@@ -14,3 +15,6 @@ Goals
 Screenshot
 ----------
 ![Example](http://code.disqus.com/jones/docs/img/testservice.png)
+
+  [1]: http://travis-ci.org/#!/disqus/jones
+  [2]: https://secure.travis-ci.org/disqus/jones.png?branch=master
