@@ -49,11 +49,6 @@ class Jones(object):
         self._get_env_path = partial(self._get_path_by_env, self.conf_path)
         self._get_view_path = partial(self._get_path_by_env, self.view_path)
 
-    def exists(self):
-        """Does this service exist in zookeeper"""
-
-        return self.zk.exists(self.root)
-
     def create_config(self, env, conf):
         """
         Set conf to env under service.
@@ -134,11 +129,6 @@ class Jones(object):
             self._get_view_path(env)
         )
 
-    def get_child_envs(self, env=None):
-        prefix = self._get_env_path(env)
-        envs = self.zk.walk(prefix)
-        return itertools.imap(lambda e: e[len(prefix):], envs)
-
     def assoc_host(self, hostname, env):
         """
         Associate a host with an environment.
@@ -178,8 +168,18 @@ class Jones(object):
         del keys['%s ->' % hostname]
         self._set(self.nodemap_path, keys, version)
 
+    def exists(self):
+        """Does this service exist in zookeeper"""
+
+        return self.zk.exists(self.root)
+
     def delete_all(self):
         self.zk.delete_recursive(self.root)
+
+    def get_child_envs(self, env=None):
+        prefix = self._get_env_path(env)
+        envs = self.zk.walk(prefix)
+        return itertools.imap(lambda e: e[len(prefix):], envs)
 
     def _flatten_to_root(self, env):
         """

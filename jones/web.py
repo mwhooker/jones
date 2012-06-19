@@ -37,6 +37,7 @@ if 'SENTRY_DSN' in app.config:
 
 zk = zc.zk.ZooKeeper(app.config['ZK_CONNECTION_STRING'])
 
+
 def request_wants(t):
     types = ['text/plain', 'text/html', 'application/json']
     assert t in types
@@ -49,13 +50,16 @@ def request_wants(t):
 def as_json(d, indent=None):
     return Markup(json.dumps(d, indent=indent))
 
+
 @app.context_processor
 def inject_services():
     return dict(services=zk.get_children('/services'))
 
+
 @app.route('/')
 def index():
     return render_template('index.html')
+
 
 def service_create(env, jones):
 
@@ -67,6 +71,7 @@ def service_create(env, jones):
     else:
         return redirect(url_for('service', service=jones.service, env=env))
 
+
 def service_update(env, jones):
     jones.set_config(
         env,
@@ -74,6 +79,7 @@ def service_update(env, jones):
         int(request.form['version'])
     )
     return env or ''
+
 
 def service_delete(env, jones):
     if not env:
@@ -83,6 +89,7 @@ def service_delete(env, jones):
     else:
         jones.delete_config(env, -1)
     return env, 200
+
 
 def service_get(env, jones):
     if not jones.exists():
