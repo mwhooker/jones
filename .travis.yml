@@ -10,7 +10,7 @@ before_install:
 install:
     - pip install --use-mirrors zc-zookeeper-static >/dev/null 2>&1
     - python setup.py develop
-    - pip install . --use-mirrors
+    - pip install --use-mirrors jones[test]
 
 # command to run tests
 script: nosetests
