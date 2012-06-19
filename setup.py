@@ -21,11 +21,11 @@ VERSION = '0.1'
 NAME = 'jones'
 
 install_requires = [
-    'zc.zk'
+    'zc-zookeeper-static',
 ]
 
 web_requires = install_requires + [
-    'zc-zookeeper-static',
+    'zc.zk',
     'flask'
 ]
 
