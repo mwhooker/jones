@@ -30,7 +30,8 @@ tests_require = [
 
 install_requires = [
     'flask',
-    'zc-zookeeper-static'
+    'zc-zookeeper-static',
+    'zc.zk'
 ]
 
 
