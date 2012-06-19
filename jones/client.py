@@ -22,6 +22,13 @@ class JonesClient(object):
     """An example client for accessing config stored by Jones."""
 
     def __init__(self, service, zk, cb, hostname=None):
+        """ 
+        service: name of the service to get config for.
+        zk: zc.zk object.
+        cb: method to be called with config when it changes.
+        hostname: Node to get associated configuration data for.
+        """
+
         self.service = service
         self.zk = zk
         self.cb = cb
