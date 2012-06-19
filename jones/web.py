@@ -15,7 +15,7 @@ limitations under the License.
 """
 
 
-from flask import Flask, redirect, render_template, request, url_for
+from flask import Flask, jsonify, redirect, render_template, request, url_for
 from raven.contrib.flask import Sentry
 from werkzeug.contrib.fixers import ProxyFix
 from jinja2 import Markup
@@ -37,6 +37,13 @@ if 'SENTRY_DSN' in app.config:
 
 zk = zc.zk.ZooKeeper(app.config['ZK_CONNECTION_STRING'])
 
+def request_wants(t):
+    types = ['text/plain', 'text/html', 'application/json']
+    assert t in types
+    best = request.accept_mimetypes \
+        .best_match(types)
+    return best == t
+
 
 @app.template_filter()
 def as_json(d, indent=None):
@@ -51,8 +58,14 @@ def index():
     return render_template('index.html')
 
 def service_create(env, jones):
+
     jones.create_config(env, {})
-    return env, 201
+    if request_wants('application/json') or request_wants('text/plain'):
+        r = jsonify(service=jones.service)
+        r.status_code = 201
+        return r
+    else:
+        return redirect(url_for('service', service=jones.service))
 
 def service_update(env, jones):
     jones.set_config(
@@ -60,9 +73,13 @@ def service_update(env, jones):
         json.loads(request.form['data']),
         int(request.form['version'])
     )
-    return env
+    return env or ''
 
 def service_delete(env, jones):
+    if not env:
+        # deleting whole service
+        jones.delete_all()
+        return redirect(url_for('index'))
     jones.delete_config(env, -1)
     return env, 200
 

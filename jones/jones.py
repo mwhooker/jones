@@ -60,7 +60,7 @@ class Jones(object):
             raise ValueError("conf must be a collections.Mapping")
 
         for k in (self.view_path, self.nodemap_path):
-            self.zk.create_recursive(k, '', zc.zk.OPEN_ACL_UNSAFE)
+            self.zk.create_recursive(k, '{}', zc.zk.OPEN_ACL_UNSAFE)
 
         self.zk.create(
             self._get_env_path(env),
@@ -159,8 +159,7 @@ class Jones(object):
         """
 
         assocs = defaultdict(list)
-        keys, meta = self.zk.get(self.nodemap_path)
-        keys = json.loads(keys)
+        version, keys = self._get(self.nodemap_path)
         for k in keys:
             assert k[-3:] == ' ->'
             prefix = self.view_path + '/'
@@ -170,10 +169,13 @@ class Jones(object):
         return dict(assocs)
 
     def delete_association(self, hostname):
-        keys, meta = self.zk.get(self.nodemap_path)
+        version, keys = self._get(self.nodemap_path)
         keys = json.loads(keys)
         del keys['%s ->' % hostname]
-        self._set(self.nodemap_path, keys, meta['version'])
+        self._set(self.nodemap_path, keys, version)
+
+    def delete_all(self):
+        self.zk.delete_recursive(self.root)
 
     def _flatten_to_root(self, env):
         """

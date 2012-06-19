@@ -2,7 +2,9 @@
    * Add versions to services controller. (DONE)
    * Implement update. (DONE)
    * fuck modals. just drop a textinput below the li/tr (DONE)
-   * Mechanism for creating new services. (NEXT)
+   * Mechanism for creating new services. (DONE)
+   * UI. Adding a child should redirect you to that node
+   * UI. Deleting root node should bounce you to index
    * Support versions, rollback, and pegging to a version
        * Log every action so we can recreate in case of accident.
    * Prompt user for confirmation before deleting node.

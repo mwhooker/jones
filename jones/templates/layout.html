@@ -25,7 +25,7 @@
               <a href="{{ href|e }}">{{ caption|e }}</a>
               </li>
               {% endfor %}
-              <li class="dropdown">
+              <li id="service-nav" class="dropdown">
               <a href="#"
                   class="dropdown-toggle"
                   data-toggle="dropdown">
@@ -36,6 +36,10 @@
                   {% for service in services %}
                   <li><a href="/service/{{ service }}">{{ service }}</a></li>
                   {% endfor %}
+                  <li class="divider"></li>
+                  <form class="navbar-form pull-left" method="post">
+                      <input type="text" class="span2" placeholder="Add Service…">
+                  </form>
               </ul>
               </li>
           </ul>
@@ -63,6 +67,14 @@
 
     <script src="{{ url_for('.static', filename='js/jquery-1.7.2.min.js') }}"></script>
     <script src="{{ url_for('.static', filename='js/bootstrap.min.js') }}"></script>
+    <script>
+        $(function() {
+            $('#service-nav form').submit(function() {
+                console.log($('input', this).val());
+                $(this).attr('action', '/service/' + $('input', this).val());
+            });
+        });
+    </script>
     {% block footer %}{% endblock %}
 
   </body>
