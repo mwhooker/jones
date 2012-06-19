@@ -13,4 +13,4 @@ install:
     - pip install --use-mirrors jones[test]
 
 # command to run tests
-script: nosetests
+script: nosetests jones
