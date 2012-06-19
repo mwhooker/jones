@@ -15,7 +15,7 @@ var config = {{ config | tojson |safe }};
     <h4></h4>
   </div>
   <div class="modal-body">
-      <form>
+      <form method="post">
           <fieldset>
               <label>Child</label>
               <input type="text">
@@ -62,7 +62,7 @@ var config = {{ config | tojson |safe }};
                                 {% if is_leaf %}
                                 <a class="btn del-env btn-mini" href="{{ child_url }}">Delete</a>
                                 {% endif %}
-                                <a class="btn add-env btn-mini" href="{{ child_url }}">Add Child</a>
+                                <a class="btn add-env btn-mini" data-env="{{ child_url }}">Add Child</a>
                             </span>
                         </td>
                     </tr>

@@ -65,7 +65,7 @@ def service_create(env, jones):
         r.status_code = 201
         return r
     else:
-        return redirect(url_for('service', service=jones.service))
+        return redirect(url_for('service', service=jones.service, env=env))
 
 def service_update(env, jones):
     jones.set_config(

@@ -17,35 +17,26 @@ $(function() {
         });
     });
 
-    $('#addChildModal form').submit(function() {
-        $('#modalSubmit').click();
-        return false;
-    });
-
     $('.add-env').click(function() {
-        var input = $('#addChildModal input');
-        var href = $(this).attr('href');
+      console.log('hi');
+      var form = $('#addChildModal form');
+      var env = $(this).data('env');
+      console.log(env)
 
-        $('#addChildModal .modal-header h4').text(href);
-        $('#addChildModal').modal();
-        input.focus();
-        console.log(href);
-        $('#modalSubmit').click(function() {
-            console.log(input.val());
-            console.log(href);
+      $('#addChildModal .modal-header h4').text(env);
+      $('#addChildModal').modal();
 
-            // TODO: validate no slashes
-            $.post(href + '/' + input.val(), {}, function () {
-                $('#addChildModal').modal('hide');
-                window.location.reload(true);
-            });
-            return false;
-        });
-        return false;
+      $('input', form).focus();
+      $(form).submit(function() {
+        $(this).attr('action', env + '/' + $('input', this).val());
+        console.log($(this).attr('action'));
+      });
+
+      return false;
     });
 
-    $('#addChildModal').on('hide', function () {
-        $('#modalSubmit').unbind('click');
+    $('#modalSubmit').click(function() {
+      $('#addChildModal form').submit();
     });
 
     // TODO: confirm delete.

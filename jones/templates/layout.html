@@ -70,7 +70,6 @@
     <script>
         $(function() {
             $('#service-nav form').submit(function() {
-                console.log($('input', this).val());
                 $(this).attr('action', '/service/' + $('input', this).val());
             });
         });
