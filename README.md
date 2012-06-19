@@ -1,6 +1,7 @@
 jones
 =====
 
+.. image:: https://secure.travis-ci.org/disqus/jones.png?branch=master
 Jones is a configuration frontend for Zookeeper.
 
 Goals
