@@ -131,7 +131,6 @@ ALL_METHODS = ['GET', 'PUT', 'POST', 'DELETE']
 def service(service, env):
     jones = Jones(service, zk)
 
-    print request.method
     return SERVICE[request.method.lower()](env, jones)
 
 
