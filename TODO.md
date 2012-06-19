@@ -4,7 +4,7 @@
    * fuck modals. just drop a textinput below the li/tr (DONE)
    * Mechanism for creating new services. (DONE)
    * UI. Adding a child should redirect you to that node (DONE)
-   * UI. Deleting root node should bounce you to index
+   * Deleting root node should bounce you to index (DONE)
    * UI. Deleting root node should prompt for confirmation
    * UI. Catch exceptions and flash messages (or do '/' validation)
    * Support versions, rollback, and pegging to a version

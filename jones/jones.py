@@ -49,6 +49,11 @@ class Jones(object):
         self._get_env_path = partial(self._get_path_by_env, self.conf_path)
         self._get_view_path = partial(self._get_path_by_env, self.view_path)
 
+    def exists(self):
+        """Does this service exist in zookeeper"""
+
+        return self.zk.exists(self.root)
+
     def create_config(self, env, conf):
         """
         Set conf to env under service.

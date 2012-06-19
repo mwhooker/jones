@@ -83,7 +83,7 @@ $(function() {
       $.ajax({
         url: href,
         type: 'delete',
-        success: function() {
+        success: function(data) {
           window.location.reload(true);
         }
       });

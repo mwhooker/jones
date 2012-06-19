@@ -79,11 +79,15 @@ def service_delete(env, jones):
     if not env:
         # deleting whole service
         jones.delete_all()
-        return redirect(url_for('index'))
-    jones.delete_config(env, -1)
+        #return redirect(url_for('index'))
+    else:
+        jones.delete_config(env, -1)
     return env, 200
 
 def service_get(env, jones):
+    if not jones.exists():
+        return redirect(url_for('index'))
+
     children = list(jones.get_child_envs())
     is_leaf = lambda child: not any(
         [c.find(child + '/') >= 0 for c in children])
