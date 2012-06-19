@@ -1,0 +1,4 @@
+include LICENSE
+prune jones
+include jones/__init__.py
+include jones/client.py

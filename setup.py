@@ -14,19 +14,22 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-from setuptools import setup, find_packages
+from setuptools import setup
 
 
 VERSION = '0.1'
 NAME = 'jones'
 
 install_requires = [
-    'flask',
-    'zc-zookeeper-static',
     'zc.zk'
 ]
 
-tests_require = install_requires + [
+web_requires = install_requires + [
+    'zc-zookeeper-static',
+    'flask'
+]
+
+tests_require = web_requires + [
     'nose',
     'unittest2',
     'mock',
@@ -42,10 +45,7 @@ if __name__ == '__main__':
         url='https://github.com/disqus/jones',
         description='Report tool for analytics.',
         license='Apache License 2.0',
-        packages=find_packages(exclude=['tests']),
-        package_data={
-            '': ['credentials.json']
-        },
+        py_modules = ['jones.client'],
         zip_safe=False,
         install_requires=install_requires,
         tests_require=tests_require,
