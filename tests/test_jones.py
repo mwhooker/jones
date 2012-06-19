@@ -149,3 +149,25 @@ class TestJones(TestCase):
             '127.0.0.3'
         )
         self.assertTrue(len(self.jones.get_associations()) > 0)
+
+    def test_create_service(self):
+        # Test that creating a service creates stub conf/view/nodemaps
+
+        env = None
+        self.jones.create_config(env, {})
+        self.assertEquals(self.jones.get_associations(), {})
+        self.assertEquals(self.jones.get_view_by_env(env)[1], {})
+        self.assertEquals(self.jones.get_config_by_env(env)[1], {})
+
+    def test_delete_service(self):
+        # Test that deleting a service removes all sub-nodes
+
+        env = None
+        self.jones.create_config(env, {})
+
+        self.jones.delete_all()
+        self.assertRaises(
+            zookeeper.NoNodeException,
+            self.zk.get,
+            self.jones.root
+        )

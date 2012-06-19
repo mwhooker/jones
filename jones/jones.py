@@ -170,7 +170,6 @@ class Jones(object):
 
     def delete_association(self, hostname):
         version, keys = self._get(self.nodemap_path)
-        keys = json.loads(keys)
         del keys['%s ->' % hostname]
         self._set(self.nodemap_path, keys, version)
 
