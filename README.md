@@ -47,42 +47,44 @@ It's also incredibly simple (only 30 lines), so it should be easy to customize. 
 Design
 ------
 
-Environments are stored under their parent in znodes on the zookeeper data tree. On write the view algorithm is used to
+Environments are stored under their parent znodes on the zookeeper data tree. On write, the view algorithm is used to
 materialize the "inherited" config in a view node.
 
 Jones takes advantage of zookeeper's mvcc capabilities where possible. An environment will never have its data clobbered
-by a concurrent write. When updating a view, the last write wins. This may cause view data to be clobbered if concurrent
-writes are made to two nodes in the same path and Jones happens to lose its session in between. (see issue #1).
+by a concurrent write. When updating a view, however, the last write wins. This may cause view data to be clobbered if
+concurrent writes are made to two nodes in the same path and Jones happens to lose its session in between (see issue #1).
 
 Associations are a simple key to env map, stored under /nodemaps.
 
 Example data tree dump. This shows data for an example service:
 
-    /services
-      /testservice
-        /conf
+```
+/services
+  /testservice
+    /conf
+      foo = u'bar'
+      /parent
+        a = 1 
+        b = [1, 2, 3]
+        c = {u'x': 0}
+        /child1
+          a = 2 
+    /nodemaps
+      127.0.0.1 -> /services/testservice/views/parent
+      127.0.0.2 -> /services/testservice/views/parent/child1
+    /views
+      foo = u'bar'
+      /parent
+        a = 1 
+        b = [1, 2, 3]
+        c = {u'x': 0}
+        foo = u'bar'
+        /child1
+          a = 2           
+          b = [1, 2, 3]
+          c = {u'x': 0}          
           foo = u'bar'
-          /parent
-            a = 1 
-            b = [1, 2, 3]
-            c = {u'x': 0}
-            /child1
-              a = 2 
-        /nodemaps
-          127.0.0.1 -> /services/testservice/views/parent
-          127.0.0.2 -> /services/testservice/views/parent/child1
-        /views
-          foo = u'bar'
-          /parent
-            a = 1 
-            b = [1, 2, 3]
-            c = {u'x': 0}
-            foo = u'bar'
-            /child1
-              a = 2 
-              b = [1, 2, 3]
-              c = {u'x': 0}
-              foo = u'bar'
+```
 
 Glossary
 --------
@@ -93,7 +95,8 @@ Glossary
   <dt>Node</dt>
   <dd>A node in the config tree. Nodes hold configuration for an environment. Implemented as a znode.</dd>
   <dt>Environment</dt>
-  <dd>Also seen as <em>env</em> in the code, an environment is the path to a specific node in the config tree (i.e. parent/child).</dd>
+  <dd>Also seen as <em>env</em> in the code, an environment is the path to a specific node in the config tree
+  (i.e. parent/child).</dd>
   <dt>Association</dt>
   <dd>The identifier a client will use to address a node. Any string will work, but the fqdn or ip address are common.</dd>
   <dt>View</dt>
