@@ -21,7 +21,7 @@ Glossary
   <dt>Node</dt>
   <dd>A node in the config tree. Nodes hold configuration for an environment. Implemented as a znode.</dd>
   <dt>Environment</dt>
-  <dd>Also seen as _env_ in the code, an environment is a specific node config tree.</dd>
+  <dd>Also seen as <i>env</i> in the code, an environment is the path to a specific node in the config tree (i.e. parent/child).</dd>
   <dt>Association</dt>
   <dd>The identifier a client will use to address a node. Any string will work, but the fqdn or ip address are common.</dd>
   <dt>View</dt>
