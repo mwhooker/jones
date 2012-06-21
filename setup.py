@@ -25,8 +25,8 @@ install_requires = [
 ]
 
 web_requires = install_requires + [
-    'zc.zk',
-    'flask'
+    'flask',
+    'zc.zk'
 ]
 
 tests_require = web_requires + [
