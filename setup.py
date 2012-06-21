@@ -49,7 +49,10 @@ if __name__ == '__main__':
         zip_safe=False,
         install_requires=install_requires,
         tests_require=tests_require,
-        extras_require={'test': tests_require},
+        extras_require={
+            'test': tests_require,
+            'web': web_requires
+        },
         test_suite='nose.collector',
         include_package_data=True,
     )
