@@ -16,12 +16,13 @@ limitations under the License.
 
 import socket
 import zookeeper
+from collections import Mapping
 
 
-class JonesClient(object):
+class JonesClient(Mapping):
     """An example client for accessing config stored by Jones."""
 
-    def __init__(self, service, zk, cb, hostname=None):
+    def __init__(self, service, zk, cb=None, hostname=None):
         """ 
         service: name of the service to get config for.
         zk: zc.zk object.
@@ -43,6 +44,11 @@ class JonesClient(object):
         self.nodemap = self.zk.properties(root)
         self.nodemap(self._on_nodemap_change)
 
+    def _config_cb(self, node):
+        self.config = node.data
+        if self.cb:
+            self.cb(node.data)
+
     def _on_nodemap_change(self, _):
         try:
             self.config_key = self.zk.resolve(self.lookup_key)
@@ -50,4 +56,13 @@ class JonesClient(object):
             self.config_key = '/services/%s/conf' % self.service
 
         self.node = self.zk.properties(self.config_key)
-        self.node(lambda node: self.cb(node.data))
+        self.node(self._config_cb)
+
+    def __getitem__(self, key):
+        return self.config[key]
+
+    def __iter__(self):
+        return iter(self.config)
+
+    def __len__(self):
+        return len(self.config)
