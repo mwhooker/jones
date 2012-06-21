@@ -26,7 +26,7 @@ class JonesClient(Mapping):
         """ 
         service: name of the service to get config for.
         zk: zc.zk object.
-        cb: method to be called with config when it changes.
+        cb: optional method to be called with config when it changes.
         hostname: Node to get associated configuration data for.
         """
 
