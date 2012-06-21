@@ -35,13 +35,15 @@ It's also incredibly simple (only 30 lines), so it should be easy to customize. 
 
 **Use:**
 
-    from jones.client import JonesClient
+    >>> from jones.client import JonesClient
     
-    client = JonesClient('service', zk, cb, hostname)
+    >>> client = JonesClient(service, zk, cb, hostname)
+    >>> client['key']
+    'value'
 
-   * **'service':** the name of the service you want config for.
+   * **service:** the name of the service you want config for.
    * **zk:** An instance of zc.zk.ZooKeeper.
-   * **cb:** A method to be called with a config dict every time it changes.
+   * **cb:** Optional. A method to be called with a config dict every time it changes.
    * **hosname:** Optional. A key in the _associations_ map. By default JonesClient uses socket.getfqdn()
 
 Design
