@@ -17,4 +17,3 @@
    * warn user if their update failed because of version conflict
       * preserve user's changes
    * use backbone.js for associations.
-   * Move jones.py into an outside lib
