@@ -16,27 +16,20 @@ limitations under the License.
 
 from __future__ import unicode_literals
 import json
-import zc.zk
 import zookeeper
 
+from kazoo.testing import KazooTestCase
 from tests import fixture
-from unittest import TestCase
-from zc.zk import testing
 
 from jones.jones import Jones
 
 
-class TestJones(TestCase):
+class TestJones(KazooTestCase):
 
     def setUp(self):
-        cs = 'zookeeper.example.com:2181'
-        testing.setUp(self, connection_string=cs)
-        self.zk = zc.zk.ZooKeeper(cs)
+        super(TestJones, self).setUp()
 
         self.jones = Jones('testservice', self.zk)
-
-    def tearDown(self):
-        testing.tearDown(self)
 
     def test_creates_root(self):
 

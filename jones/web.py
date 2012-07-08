@@ -19,9 +19,9 @@ from flask import Flask, jsonify, redirect, render_template, request, url_for
 from raven.contrib.flask import Sentry
 from werkzeug.contrib.fixers import ProxyFix
 from jinja2 import Markup
+from kazoo.client import KazooClient
+from kazoo.exceptions import NoNodeException
 import json
-import zc.zk
-import zookeeper
 
 from jones import Jones
 import jonesconfig
@@ -35,7 +35,8 @@ app.config.from_envvar('JONES_SETTINGS', silent=True)
 if 'SENTRY_DSN' in app.config:
     sentry = Sentry(app)
 
-zk = zc.zk.ZooKeeper(app.config['ZK_CONNECTION_STRING'])
+zk = KazooClient(app.config['ZK_CONNECTION_STRING'])
+zk.connect()
 
 
 def request_wants(t):
@@ -101,7 +102,7 @@ def service_get(env, jones):
 
     try:
         version, config = jones.get_config_by_env(env)
-    except zookeeper.NoNodeException:
+    except NoNodeException:
         return redirect(url_for('service', service=jones.service))
 
     view = jones.get_view_by_env(env)[1]
@@ -145,12 +146,6 @@ def association(service, assoc):
     elif request.method == 'DELETE':
         jones.delete_association(assoc)
         return service, 200
-
-
-@app.route('/backup/<path:zkpath>', defaults={'zkpath': ''})
-@app.route('/backup', defaults={'zkpath': ''})
-def backup(zkpath):
-    return zk.export_tree('/' + zkpath)
 
 
 if __name__ == '__main__':

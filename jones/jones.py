@@ -17,10 +17,23 @@ limitations under the License.
 import collections
 import itertools
 import json
-import zookeeper
-import zc.zk
 from functools import partial
 from collections import defaultdict
+from kazoo.exceptions import NoNodeException
+
+
+"""Implement symantic links in zookeeper.i
+
+based on the ln/resolve methods found in zc.zk.
+"""
+def resolve(zk, path):
+    pass
+
+def ln(zk, dest, src):
+   pass
+
+def walk(zk, path='/'):
+    """Walk the ztree from `path`."""
 
 
 class Jones(object):
@@ -60,12 +73,11 @@ class Jones(object):
             raise ValueError("conf must be a collections.Mapping")
 
         for k in (self.view_path, self.nodemap_path):
-            self.zk.create_recursive(k, '{}', zc.zk.OPEN_ACL_UNSAFE)
+            self.zk.ensure_path(k)
 
-        self.zk.create(
+        self._set(
             self._get_env_path(env),
-            json.dumps(conf),
-            zc.zk.OPEN_ACL_UNSAFE
+            conf
         )
 
         self._update_view(env)
@@ -105,8 +117,7 @@ class Jones(object):
         )
 
         self.zk.delete(
-            self._get_view_path(env),
-            -1
+            self._get_view_path(env)
         )
 
     def get_config(self, hostname):
@@ -116,7 +127,7 @@ class Jones(object):
         Version must be used with future calls to set_config.
         """
         return self._get(
-            self.zk.resolve(self._get_nodemap_path(hostname))
+            resolve(self.zk, self._get_nodemap_path(hostname))
         )
 
     def get_config_by_env(self, env):
@@ -139,9 +150,10 @@ class Jones(object):
 
         dest = self._get_view_path(env)
         if not self.zk.exists(dest):
-            raise zookeeper.NoNodeException
+            raise NoNodeException
 
-        self.zk.ln(
+        ln(
+            self.zk,
             dest,
             self._get_nodemap_path(hostname)
         )
@@ -174,11 +186,11 @@ class Jones(object):
         return self.zk.exists(self.root)
 
     def delete_all(self):
-        self.zk.delete_recursive(self.root)
+        self.zk.recursive_delete(self.root)
 
     def get_child_envs(self, env=None):
         prefix = self._get_env_path(env)
-        envs = self.zk.walk(prefix)
+        envs = walk(self.zk, prefix)
         return itertools.imap(lambda e: e[len(prefix):], envs)
 
     def _flatten_to_root(self, env):
@@ -210,7 +222,7 @@ class Jones(object):
 
         dest = self._get_view_path(env)
         if not self.zk.exists(dest):
-            self.zk.create(dest, '', zc.zk.OPEN_ACL_UNSAFE)
+            self.zk.ensure_path(dest)
 
         self._set(dest, self._flatten_to_root(env))
 

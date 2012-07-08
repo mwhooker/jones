@@ -22,11 +22,12 @@ NAME = 'jones'
 
 install_requires = [
     'zc-zookeeper-static',
+    'kazoo'
 ]
 
 web_requires = install_requires + [
     'flask',
-    'zc.zk'
+    'raven'
 ]
 
 tests_require = web_requires + [
