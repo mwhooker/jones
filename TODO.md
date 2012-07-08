@@ -6,7 +6,6 @@
    * UI. Adding a child should redirect you to that node (DONE)
    * Deleting root node should bounce you to index (DONE)
    * implement UI code for associations. (DONE)
-   * Prompt user for confirmation before deleting node.
    * UI. Deleting root node should prompt for confirmation
    * UI. Catch exceptions and flash messages (or do '/' validation)
    * validate node name client-side before accepting creation.
@@ -17,3 +16,5 @@
    * warn user if their update failed because of version conflict
       * preserve user's changes
    * use backbone.js for associations.
+   * monitor zk connection state
+      * if no connection can be made, send app into reduced functionality mode
