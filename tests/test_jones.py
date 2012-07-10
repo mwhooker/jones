@@ -29,14 +29,14 @@ class TestJones(KazooTestCase):
     def setUp(self):
         super(TestJones, self).setUp()
 
-        self.jones = Jones('testservice', self.zk)
+        self.jones = Jones('testservice', self.client)
 
     def test_creates_root(self):
 
         fixt = {'xy': 'z'}
         self.jones.create_config(None, fixt)
         self.assertEquals(
-            json.loads(self.zk.get(self.jones.view_path)[0]),
+            json.loads(self.client.get(self.jones.view_path)[0]),
             fixt
         )
 
@@ -62,7 +62,7 @@ class TestJones(KazooTestCase):
         parent = dict(fixture.CONFIG['parent'])
         parent['new'] = 'key'
         self.jones.set_config('parent', parent, 0)
-        #self.zk.print_tree('/services')
+        #self.client.print_tree('/services')
 
         for i in ('127.0.0.1', '127.0.0.2'):
             _, config = self.jones.get_config(i)
@@ -161,6 +161,6 @@ class TestJones(KazooTestCase):
         self.jones.delete_all()
         self.assertRaises(
             zookeeper.NoNodeException,
-            self.zk.get,
+            self.client.get,
             self.jones.root
         )

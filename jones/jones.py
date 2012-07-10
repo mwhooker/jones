@@ -30,10 +30,23 @@ def resolve(zk, path):
     pass
 
 def ln(zk, dest, src):
-   pass
+    if not zk.exists(dest):
+        raise NoNodeException
 
 def walk(zk, path='/'):
     """Walk the ztree from `path`."""
+
+
+class SymbolicLink(object):
+    """Model symbolic links between znodes."""
+
+    def __init__(self, zk, map_path):
+        """
+        zk: KazooClient instance
+        map_path: znode to store associations
+        """
+        self.zk = zk
+        self.map_path = map_path
 
 
 class Jones(object):
@@ -75,7 +88,7 @@ class Jones(object):
         for k in (self.view_path, self.nodemap_path):
             self.zk.ensure_path(k)
 
-        self._set(
+        self._create(
             self._get_env_path(env),
             conf
         )
@@ -149,8 +162,6 @@ class Jones(object):
         """
 
         dest = self._get_view_path(env)
-        if not self.zk.exists(dest):
-            raise NoNodeException
 
         ln(
             self.zk,
@@ -237,7 +248,10 @@ class Jones(object):
 
     def _get(self, path):
         data, metadata = self.zk.get(path)
-        return metadata['version'], json.loads(data)
+        return metadata.version, json.loads(data)
 
     def _set(self, path, data, *args, **kwargs):
         return self.zk.set(path, json.dumps(data), *args, **kwargs)
+
+    def _create(self, path, data, *args, **kwargs):
+        return self.zk.create(path, json.dumps(data), *args, **kwargs)
