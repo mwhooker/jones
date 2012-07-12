@@ -55,7 +55,8 @@ def as_json(d, indent=None):
 
 @app.context_processor
 def inject_services():
-    return dict(services=zk.get_children('/services'))
+    return dict(services=[child for child in zk.get_children('/services') if
+                          Jones(child, zk).exists()])
 
 
 @app.route('/')
@@ -97,9 +98,11 @@ def service_get(env, jones):
     if not jones.exists():
         return redirect(url_for('index'))
 
-    children = list(jones.get_child_envs())
+    children = jones.get_child_envs()
     is_leaf = lambda child: not any(
         [c.find(child + '/') >= 0 for c in children])
+    children = zip(children, map(is_leaf, children))
+    children.insert(0, ('', len(children) == 0))
 
     try:
         version, config = jones.get_config_by_env(env)
@@ -110,7 +113,7 @@ def service_get(env, jones):
     return render_template('service.html',
                            env=env or '',
                            version=version,
-                           children=zip(children, map(is_leaf, children)),
+                           children=children,
                            config=config,
                            view=view,
                            service=jones.service,
@@ -136,6 +139,7 @@ def service(service, env):
     return SERVICE[request.method.lower()](env, jones)
 
 
+# TODO: what if we have a path called association?
 @app.route('/service/<string:service>/association/<string:assoc>',
            methods=['PUT', 'DELETE'])
 def association(service, assoc):
