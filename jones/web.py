@@ -23,7 +23,8 @@ from kazoo.client import KazooClient
 from kazoo.exceptions import NoNodeException
 import json
 
-from jones import Jones, walk, export_tree
+from jones import Jones
+import zkutil
 import jonesconfig
 
 
@@ -152,7 +153,7 @@ def association(service, assoc):
 
 @app.route('/export')
 def export():
-    return export_tree(zk, '/')
+    return zkutil.export_tree(zk, '/')
 
 
 if __name__ == '__main__':
