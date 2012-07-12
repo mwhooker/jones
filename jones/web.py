@@ -116,7 +116,7 @@ def service_get(env, jones):
                            config=config,
                            view=view,
                            service=jones.service,
-                           associations=jones.get_associations()
+                           associations=jones.get_associations(env)
                           )
 
 SERVICE = {

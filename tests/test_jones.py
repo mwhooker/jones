@@ -123,7 +123,10 @@ class TestJones(KazooTestCase):
         fixture.init_tree(self.jones)
         assocs = self.jones.get_associations()
         for host in fixture.ASSOCIATIONS:
-            self.assertEquals(assocs[host], fixture.ASSOCIATIONS[host])
+            self.assertEquals(
+                assocs[host],
+                self.jones._get_view_path(fixture.ASSOCIATIONS[host])
+            )
 
     def test_delete_association(self):
         fixture.init_tree(self.jones)
@@ -140,9 +143,15 @@ class TestJones(KazooTestCase):
 
         env = None
         self.jones.create_config(env, {})
-        self.assertEquals(self.jones.get_associations(), {})
+        self.assertEquals(self.jones.get_associations(env), {})
         self.assertEquals(self.jones.get_view_by_env(env)[1], {})
         self.assertEquals(self.jones.get_config_by_env(env)[1], {})
+        self.assertEquals(self.jones.get_child_envs(env), [''])
+
+    def test_exists_reflectes_creation(self):
+        self.assertFalse(self.jones.exists())
+        self.jones.create_config(None, {})
+        self.assertTrue(self.jones.exists())
 
     def test_delete_service(self):
         # Test that deleting a service removes all sub-nodes

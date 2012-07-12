@@ -15,36 +15,9 @@ limitations under the License.
 """
 
 import collections
-import itertools
 import json
 from functools import partial
-
-
-def export_tree(zk, root):
-    out = []
-    for path in walk(zk, root):
-        spacing = ' ' * 2 * (path.count('/') - 1)
-        long_spacing = spacing + (' ' * 2)
-        out.append(spacing + path)
-        data, stat = zk.get(path)
-        if len(data):
-            out.append(
-                ''.join(long_spacing + line for line in data.splitlines(True))
-            )
-    return '\n'.join(out)
-
-
-def walk(zk, path='/'):
-    """Walk the ztree from `path`."""
-    children = zk.get_children(path)
-    yield path
-    for child in children:
-        if path == '/':
-            subpath = "/%s" % child
-        else:
-            subpath = "%s/%s" % (path, child)
-        yield subpath
-        walk(zk, subpath)
+import zkutil
 
 
 class ZNodeMap(object):
@@ -92,7 +65,6 @@ class ZNodeMap(object):
         data, stat = self.zk.get(self.path)
         return _deserialize(data), stat.version
 
-
     def _set(self, data, version):
         """serialize and set data to self.path."""
 
@@ -124,6 +96,14 @@ class Jones(object):
         self.conf_path = "%s/conf" % self.root
         self.view_path = "%s/views" % self.root
         self.associations = ZNodeMap(zk, "%s/nodemaps" % self.root)
+
+        """
+        self.zk.ensure_path(self.conf_path)
+        try:
+            self.zk.create(self.conf_path, '{}', makepath=True)
+        except NodeExistsException:
+            pass
+        """
 
         self._get_env_path = partial(self._get_path_by_env, self.conf_path)
         self._get_view_path = partial(self._get_path_by_env, self.view_path)
@@ -216,14 +196,19 @@ class Jones(object):
         dest = self._get_view_path(env)
         self.associations.set(hostname, dest)
 
-    def get_associations(self):
+    def get_associations(self, env=None):
         """
-        Get all the associations in this service.
+        Get all the associations for this env, or all if env is None.
 
-        returns a map of environments to hostnames.
+        returns a map of hostnames to environments.
         """
 
-        return self.associations.get_all()
+        associations = self.associations.get_all()
+
+        if not env:
+            return associations
+        return [assoc for assoc in associations
+                if associations[assoc] == self._get_view_path(env)]
 
     def delete_association(self, hostname):
         self.associations.delete(hostname)
@@ -231,15 +216,17 @@ class Jones(object):
     def exists(self):
         """Does this service exist in zookeeper"""
 
-        return self.zk.exists(self.root)
+        return self.zk.exists(
+            self._get_env_path(None)
+        )
 
     def delete_all(self):
         self.zk.recursive_delete(self.root)
 
     def get_child_envs(self, env=None):
         prefix = self._get_env_path(env)
-        envs = walk(self.zk, prefix)
-        return itertools.imap(lambda e: e[len(prefix):], envs)
+        envs = zkutil.walk(self.zk, prefix)
+        return map(lambda e: e[len(prefix):], envs)
 
     def _flatten_to_root(self, env):
         """

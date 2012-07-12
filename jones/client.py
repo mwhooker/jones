@@ -15,9 +15,8 @@ limitations under the License.
 """
 
 import socket
-import zookeeper
 from collections import Mapping
-from jones import jones
+import json
 
 
 class JonesClient(Mapping):
@@ -39,25 +38,31 @@ class JonesClient(Mapping):
             hostname = socket.getfqdn()
         self.hostname = hostname
 
-        root = "/services/%s/nodemaps" % service
-        self.lookup_key = root + '/' + hostname
+        self.nodemap_path = "/services/%s/nodemaps" % service
 
-        self.nodemap = self.zk.properties(root)
-        self.nodemap(self._on_nodemap_change)
+        self._get_config()
 
-    def _config_cb(self, node):
-        self.config = node.data
-        if self.cb:
-            self.cb(node.data)
 
-    def _on_nodemap_change(self, _):
+    def _get_config(self, *args):
+
+        def _deserialize(d):
+            if not len(d):
+                return {}
+            return dict(l.split(' -> ') for l in d.split('\n'))
+
+        nodemap, stat = self.zk.get(self.nodemap_path, self._get_config)
+
         try:
-            self.config_key = self.zk.resolve(self.lookup_key)
-        except zookeeper.NoNodeException:
-            self.config_key = '/services/%s/conf' % self.service
+            conf_path = _deserialize(nodemap)[self.hostname]
+        except KeyError:
+            conf_path = '/services/%s/conf' % self.service
 
-        self.node = self.zk.properties(self.config_key)
-        self.node(self._config_cb)
+        config, stat = self.zk.get(conf_path, self._get_config)
+        self.config = json.loads(config)
+
+        if self.cb:
+            self.cb(self.config)
+
 
     def __getitem__(self, key):
         return self.config[key]
