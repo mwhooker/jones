@@ -101,8 +101,6 @@ def service_get(env, jones):
     children = jones.get_child_envs()
     is_leaf = lambda child: not any(
         [c.find(child + '/') >= 0 for c in children])
-    children = zip(children, map(is_leaf, children))
-    children.insert(0, ('', len(children) == 0))
 
     try:
         version, config = jones.get_config_by_env(env)
@@ -113,7 +111,7 @@ def service_get(env, jones):
     return render_template('service.html',
                            env=env or '',
                            version=version,
-                           children=children,
+                           children=zip(children, map(is_leaf, children)),
                            config=config,
                            view=view,
                            service=jones.service,

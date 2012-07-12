@@ -33,17 +33,18 @@ def export_tree(zk, root):
             )
     return '\n'.join(out)
 
+
 def walk(zk, path='/'):
     """Walk the ztree from `path`."""
     children = zk.get_children(path)
+    yield path
     for child in children:
         if path == '/':
             subpath = "/%s" % child
         else:
             subpath = "%s/%s" % (path, child)
         yield subpath
-        for l in walk(zk, subpath):
-            yield l
+        walk(zk, subpath)
 
 
 class ZNodeMap(object):
