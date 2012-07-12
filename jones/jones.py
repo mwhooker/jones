@@ -23,7 +23,7 @@ import zkutil
 class ZNodeMap(object):
     """Associate znodes with names."""
 
-    SEPERATOR = ' -> '
+    SEPARATOR = ' -> '
 
     def __init__(self, zk, path):
         """
@@ -60,7 +60,7 @@ class ZNodeMap(object):
         def _deserialize(d):
             if not len(d):
                 return {}
-            return dict(l.split(self.SEPERATOR) for l in d.split('\n'))
+            return dict(l.split(self.SEPARATOR) for l in d.split('\n'))
 
         data, stat = self.zk.get(self.path)
         return _deserialize(data), stat.version
@@ -69,7 +69,7 @@ class ZNodeMap(object):
         """serialize and set data to self.path."""
 
         def _serialize(d):
-            return '\n'.join(self.SEPERATOR.join((k, d[k])) for k in d)
+            return '\n'.join(self.SEPARATOR.join((k, d[k])) for k in d)
 
         self.zk.set(self.path, _serialize(data), version)
 
