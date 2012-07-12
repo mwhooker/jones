@@ -110,14 +110,6 @@ class TestJones(KazooTestCase):
             env
         )
 
-    def test_cannot_associate_to_nonexistant_env(self):
-        fixture.init_tree(self.jones)
-        self.assertRaises(
-            zookeeper.NoNodeException,
-            self.jones.assoc_host,
-            'abc', 'foobar'
-        )
-
     def test_conf_is_mapping(self):
         """Make sure create_config only allows collections.Mapping types"""
 

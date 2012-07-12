@@ -18,7 +18,6 @@ import collections
 import itertools
 import json
 from functools import partial
-from kazoo.exceptions import NoNodeException
 
 
 def walk(zk, path='/'):
@@ -41,8 +40,6 @@ class ZNodeMap(object):
         zk.ensure_path(path)
 
     def set(self, name, dest):
-        if not self.zk.exists(dest):
-            raise NoNodeException
         zmap, version = self._get()
         zmap[name] = dest
         self._set(zmap, version)
