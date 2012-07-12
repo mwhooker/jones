@@ -22,9 +22,10 @@
 
 # Kazoo
 implement:
-  walk
+  walk (DONE)
   resolve (DONE)
   ln (DONE)
 test:
-  ZNodeLink
-
+  ZNodeLink (DONEish)
+fix:
+ travis-ci
