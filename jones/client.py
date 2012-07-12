@@ -23,7 +23,7 @@ class JonesClient(Mapping):
     """An example client for accessing config stored by Jones."""
 
     def __init__(self, service, zk, cb=None, hostname=None):
-        """ 
+        """
         service: name of the service to get config for.
         zk: zc.zk object.
         cb: optional method to be called with config when it changes.
@@ -41,7 +41,6 @@ class JonesClient(Mapping):
         self.nodemap_path = "/services/%s/nodemaps" % service
 
         self._get_config()
-
 
     def _get_config(self, *args):
 
@@ -62,7 +61,6 @@ class JonesClient(Mapping):
 
         if self.cb:
             self.cb(self.config)
-
 
     def __getitem__(self, key):
         return self.config[key]
