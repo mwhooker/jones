@@ -18,35 +18,68 @@ import collections
 import itertools
 import json
 from functools import partial
-from collections import defaultdict
 from kazoo.exceptions import NoNodeException
 
-
-"""Implement symantic links in zookeeper.i
-
-based on the ln/resolve methods found in zc.zk.
-"""
-def resolve(zk, path):
-    pass
-
-def ln(zk, dest, src):
-    if not zk.exists(dest):
-        raise NoNodeException
 
 def walk(zk, path='/'):
     """Walk the ztree from `path`."""
 
 
-class SymbolicLink(object):
-    """Model symbolic links between znodes."""
+class ZNodeMap(object):
+    """Associate znodes with names."""
 
-    def __init__(self, zk, map_path):
+    SEPERATOR = ' -> '
+
+    def __init__(self, zk, path):
         """
         zk: KazooClient instance
-        map_path: znode to store associations
+        path: znode to store associations
         """
         self.zk = zk
-        self.map_path = map_path
+        self.path = path
+
+        zk.ensure_path(path)
+
+    def set(self, name, dest):
+        if not self.zk.exists(dest):
+            raise NoNodeException
+        zmap, version = self._get()
+        zmap[name] = dest
+        self._set(zmap, version)
+
+    def get(self, name):
+        return self.get_all()[name]
+
+    def get_all(self):
+        """returns a map of names to destinations."""
+
+        zmap, v = self._get()
+        return zmap
+
+    def delete(self, name):
+        zmap, version = self._get()
+        del zmap[name]
+        self._set(zmap, version)
+
+    def _get(self):
+        """get and parse data stored in self.path."""
+
+        def _deserialize(d):
+            if not len(d):
+                return {}
+            return dict(l.split(self.SEPERATOR) for l in d.split('\n'))
+
+        data, stat = self.zk.get(self.path)
+        return _deserialize(data), stat.version
+
+
+    def _set(self, data, version):
+        """serialize and set data to self.path."""
+
+        def _serialize(d):
+            return '\n'.join(self.SEPERATOR.join((k, d[k])) for k in d)
+
+        self.zk.set(self.path, _serialize(data), version)
 
 
 class Jones(object):
@@ -70,7 +103,7 @@ class Jones(object):
         self.root = "/services/%s" % service
         self.conf_path = "%s/conf" % self.root
         self.view_path = "%s/views" % self.root
-        self.nodemap_path = "%s/nodemaps" % self.root
+        self.associations = ZNodeMap(zk, "%s/nodemaps" % self.root)
 
         self._get_env_path = partial(self._get_path_by_env, self.conf_path)
         self._get_view_path = partial(self._get_path_by_env, self.view_path)
@@ -85,8 +118,7 @@ class Jones(object):
         if not isinstance(conf, collections.Mapping):
             raise ValueError("conf must be a collections.Mapping")
 
-        for k in (self.view_path, self.nodemap_path):
-            self.zk.ensure_path(k)
+        self.zk.ensure_path(self.view_path)
 
         self._create(
             self._get_env_path(env),
@@ -140,7 +172,7 @@ class Jones(object):
         Version must be used with future calls to set_config.
         """
         return self._get(
-            resolve(self.zk, self._get_nodemap_path(hostname))
+            self.associations.get(hostname)
         )
 
     def get_config_by_env(self, env):
@@ -162,12 +194,7 @@ class Jones(object):
         """
 
         dest = self._get_view_path(env)
-
-        ln(
-            self.zk,
-            dest,
-            self._get_nodemap_path(hostname)
-        )
+        self.associations.set(hostname, dest)
 
     def get_associations(self):
         """
@@ -176,20 +203,10 @@ class Jones(object):
         returns a map of environments to hostnames.
         """
 
-        assocs = defaultdict(list)
-        version, keys = self._get(self.nodemap_path)
-        for k in keys:
-            assert k[-3:] == ' ->'
-            prefix = self.view_path + '/'
-            hostname = keys[k][len(prefix):]
-            assocs[hostname].append(k[:-3])
-
-        return dict(assocs)
+        return self.associations.get_all()
 
     def delete_association(self, hostname):
-        version, keys = self._get(self.nodemap_path)
-        del keys['%s ->' % hostname]
-        self._set(self.nodemap_path, keys, version)
+        self.associations.delete(hostname)
 
     def exists(self):
         """Does this service exist in zookeeper"""
@@ -237,14 +254,14 @@ class Jones(object):
 
         self._set(dest, self._flatten_to_root(env))
 
-    def _get_nodemap_path(self, hostname):
-        return "%s/%s" % (self.nodemap_path, hostname)
-
     def _get_path_by_env(self, prefix, env):
         if not env:
             return prefix
         assert env[0] != '/'
         return '/'.join((prefix, env))
+
+    def _get_nodemap_path(self, hostname):
+        return "%s/%s" % (self.nodemap_path, hostname)
 
     def _get(self, path):
         data, metadata = self.zk.get(path)

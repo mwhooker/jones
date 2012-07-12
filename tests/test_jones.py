@@ -130,14 +130,14 @@ class TestJones(KazooTestCase):
     def test_get_associations(self):
         fixture.init_tree(self.jones)
         assocs = self.jones.get_associations()
-        for env in fixture.ASSOCIATIONS:
-            self.assertEquals(assocs[env], [fixture.ASSOCIATIONS[env]])
+        for host in fixture.ASSOCIATIONS:
+            self.assertEquals(assocs[host], fixture.ASSOCIATIONS[host])
 
     def test_delete_association(self):
         fixture.init_tree(self.jones)
         self.jones.delete_association('127.0.0.3')
         self.assertRaises(
-            zookeeper.NoNodeException,
+            KeyError,
             self.jones.get_config,
             '127.0.0.3'
         )

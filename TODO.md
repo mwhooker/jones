@@ -18,9 +18,13 @@
    * use backbone.js for associations.
    * monitor zk connection state
       * if no connection can be made, send app into reduced functionality mode
+   * integration tests
 
 # Kazoo
 implement:
   walk
-  resolve
-  ln
+  resolve (DONE)
+  ln (DONE)
+test:
+  ZNodeLink
+
