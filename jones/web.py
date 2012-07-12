@@ -23,7 +23,7 @@ from kazoo.client import KazooClient
 from kazoo.exceptions import NoNodeException
 import json
 
-from jones import Jones
+from jones import Jones, walk, export_tree
 import jonesconfig
 
 
@@ -37,6 +37,7 @@ if 'SENTRY_DSN' in app.config:
 
 zk = KazooClient(app.config['ZK_CONNECTION_STRING'])
 zk.connect()
+zk.ensure_path('/services')
 
 
 def request_wants(t):
@@ -146,6 +147,10 @@ def association(service, assoc):
     elif request.method == 'DELETE':
         jones.delete_association(assoc)
         return service, 200
+
+@app.route('/export')
+def export():
+    return export_tree(zk, '/')
 
 
 if __name__ == '__main__':

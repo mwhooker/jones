@@ -17,6 +17,7 @@ limitations under the License.
 import socket
 import zookeeper
 from collections import Mapping
+from jones import jones
 
 
 class JonesClient(Mapping):

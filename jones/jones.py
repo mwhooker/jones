@@ -20,8 +20,30 @@ import json
 from functools import partial
 
 
+def export_tree(zk, root):
+    out = []
+    for path in walk(zk, root):
+        spacing = ' ' * 2 * (path.count('/') - 1)
+        long_spacing = spacing + (' ' * 2)
+        out.append(spacing + path)
+        data, stat = zk.get(path)
+        if len(data):
+            out.append(
+                ''.join(long_spacing + line for line in data.splitlines(True))
+            )
+    return '\n'.join(out)
+
 def walk(zk, path='/'):
     """Walk the ztree from `path`."""
+    children = zk.get_children(path)
+    for child in children:
+        if path == '/':
+            subpath = "/%s" % child
+        else:
+            subpath = "%s/%s" % (path, child)
+        yield subpath
+        for l in walk(zk, subpath):
+            yield l
 
 
 class ZNodeMap(object):
