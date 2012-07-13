@@ -19,11 +19,12 @@ from flask import Flask, jsonify, redirect, render_template, request, url_for
 from raven.contrib.flask import Sentry
 from werkzeug.contrib.fixers import ProxyFix
 from jinja2 import Markup
+from kazoo.client import KazooClient
+from kazoo.exceptions import NoNodeException
 import json
-import zc.zk
-import zookeeper
 
 from jones import Jones
+import zkutil
 import jonesconfig
 
 
@@ -35,7 +36,9 @@ app.config.from_envvar('JONES_SETTINGS', silent=True)
 if 'SENTRY_DSN' in app.config:
     sentry = Sentry(app)
 
-zk = zc.zk.ZooKeeper(app.config['ZK_CONNECTION_STRING'])
+zk = KazooClient(app.config['ZK_CONNECTION_STRING'])
+zk.connect()
+zk.ensure_path('/services')
 
 
 def request_wants(t):
@@ -53,7 +56,8 @@ def as_json(d, indent=None):
 
 @app.context_processor
 def inject_services():
-    return dict(services=zk.get_children('/services'))
+    return dict(services=[child for child in zk.get_children('/services') if
+                          Jones(child, zk).exists()])
 
 
 @app.route('/')
@@ -95,13 +99,13 @@ def service_get(env, jones):
     if not jones.exists():
         return redirect(url_for('index'))
 
-    children = list(jones.get_child_envs())
+    children = jones.get_child_envs()
     is_leaf = lambda child: not any(
         [c.find(child + '/') >= 0 for c in children])
 
     try:
         version, config = jones.get_config_by_env(env)
-    except zookeeper.NoNodeException:
+    except NoNodeException:
         return redirect(url_for('service', service=jones.service))
 
     view = jones.get_view_by_env(env)[1]
@@ -112,7 +116,7 @@ def service_get(env, jones):
                            config=config,
                            view=view,
                            service=jones.service,
-                           associations=jones.get_associations()
+                           associations=jones.get_associations(env)
                           )
 
 SERVICE = {
@@ -134,6 +138,7 @@ def service(service, env):
     return SERVICE[request.method.lower()](env, jones)
 
 
+# TODO: what if we have a path called association?
 @app.route('/service/<string:service>/association/<string:assoc>',
            methods=['PUT', 'DELETE'])
 def association(service, assoc):
@@ -147,10 +152,9 @@ def association(service, assoc):
         return service, 200
 
 
-@app.route('/backup/<path:zkpath>', defaults={'zkpath': ''})
-@app.route('/backup', defaults={'zkpath': ''})
-def backup(zkpath):
-    return zk.export_tree('/' + zkpath)
+@app.route('/export')
+def export():
+    return zkutil.export_tree(zk, '/')
 
 
 if __name__ == '__main__':

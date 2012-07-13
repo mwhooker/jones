@@ -16,34 +16,27 @@ limitations under the License.
 
 from __future__ import unicode_literals
 import json
-import zc.zk
 import zookeeper
 
+from kazoo.testing import KazooTestCase
 from tests import fixture
-from unittest import TestCase
-from zc.zk import testing
 
 from jones.jones import Jones
 
 
-class TestJones(TestCase):
+class TestJones(KazooTestCase):
 
     def setUp(self):
-        cs = 'zookeeper.example.com:2181'
-        testing.setUp(self, connection_string=cs)
-        self.zk = zc.zk.ZooKeeper(cs)
+        super(TestJones, self).setUp()
 
-        self.jones = Jones('testservice', self.zk)
-
-    def tearDown(self):
-        testing.tearDown(self)
+        self.jones = Jones('testservice', self.client)
 
     def test_creates_root(self):
 
         fixt = {'xy': 'z'}
         self.jones.create_config(None, fixt)
         self.assertEquals(
-            json.loads(self.zk.get(self.jones.view_path)[0]),
+            json.loads(self.client.get(self.jones.view_path)[0]),
             fixt
         )
 
@@ -69,7 +62,7 @@ class TestJones(TestCase):
         parent = dict(fixture.CONFIG['parent'])
         parent['new'] = 'key'
         self.jones.set_config('parent', parent, 0)
-        #self.zk.print_tree('/services')
+        #self.client.print_tree('/services')
 
         for i in ('127.0.0.1', '127.0.0.2'):
             _, config = self.jones.get_config(i)
@@ -117,14 +110,6 @@ class TestJones(TestCase):
             env
         )
 
-    def test_cannot_associate_to_nonexistant_env(self):
-        fixture.init_tree(self.jones)
-        self.assertRaises(
-            zookeeper.NoNodeException,
-            self.jones.assoc_host,
-            'abc', 'foobar'
-        )
-
     def test_conf_is_mapping(self):
         """Make sure create_config only allows collections.Mapping types"""
 
@@ -137,14 +122,17 @@ class TestJones(TestCase):
     def test_get_associations(self):
         fixture.init_tree(self.jones)
         assocs = self.jones.get_associations()
-        for env in fixture.ASSOCIATIONS:
-            self.assertEquals(assocs[env], [fixture.ASSOCIATIONS[env]])
+        for host in fixture.ASSOCIATIONS:
+            self.assertEquals(
+                assocs[host],
+                self.jones._get_view_path(fixture.ASSOCIATIONS[host])
+            )
 
     def test_delete_association(self):
         fixture.init_tree(self.jones)
         self.jones.delete_association('127.0.0.3')
         self.assertRaises(
-            zookeeper.NoNodeException,
+            KeyError,
             self.jones.get_config,
             '127.0.0.3'
         )
@@ -155,9 +143,15 @@ class TestJones(TestCase):
 
         env = None
         self.jones.create_config(env, {})
-        self.assertEquals(self.jones.get_associations(), {})
+        self.assertEquals(self.jones.get_associations(env), {})
         self.assertEquals(self.jones.get_view_by_env(env)[1], {})
         self.assertEquals(self.jones.get_config_by_env(env)[1], {})
+        self.assertEquals(self.jones.get_child_envs(env), [''])
+
+    def test_exists_reflectes_creation(self):
+        self.assertFalse(self.jones.exists())
+        self.jones.create_config(None, {})
+        self.assertTrue(self.jones.exists())
 
     def test_delete_service(self):
         # Test that deleting a service removes all sub-nodes
@@ -168,6 +162,6 @@ class TestJones(TestCase):
         self.jones.delete_all()
         self.assertRaises(
             zookeeper.NoNodeException,
-            self.zk.get,
+            self.client.get,
             self.jones.root
         )

@@ -55,7 +55,7 @@ var config = {{ config | tojson |safe }};
                             {% if ischild%}
                             <span><strong>{{ child_pretty }}</strong></span>
                             {% else %}
-                            {# TODO: link span shoud go all the way to buttons. #}
+                            {# TODO: link span shoud go all the way to buttons. for clicking.#}
                             <a href="{{ child_url }}"><span>{{ child_pretty }}</span></a>
                             {% endif %}
                             <span class="pull-right">
@@ -73,11 +73,12 @@ var config = {{ config | tojson |safe }};
             <h4>Associations</h4>
             <div class="well" id="associations">
                 <ul class="unstyled">
-                    {% for ip in associations[env] %}
+                    {% for hostname in associations %}
                     <li style="padding: 2px;">
-                    <span>{{ ip }}</span>
+                    {# TODO: only eval this loop if assocs[hostname] == this enviornment. #}
+                    <span>{{ hostname }}</span>
                     <span class="pull-right">
-                        <button class="btn btn-mini del-assoc" data-hostname="{{ ip }}"
+                        <button class="btn btn-mini del-assoc" data-hostname="{{ hostname }}"
                             data-loading-text="Deleting…">Delete</button>
                     </span>
                     </li>

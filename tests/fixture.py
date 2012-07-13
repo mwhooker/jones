@@ -47,9 +47,9 @@ for k in ('root', 'parent'):
 
 
 ASSOCIATIONS = {
-    '': '127.0.0.3',
-    'parent': '127.0.0.1',
-    'parent/child1': '127.0.0.2'
+    '127.0.0.3' : '',
+    '127.0.0.1' : 'parent',
+    '127.0.0.2' : 'parent/child1'
 }
 
 def init_tree(jones):
@@ -58,5 +58,5 @@ def init_tree(jones):
     jones.create_config('parent/child1', CONFIG['child1'])
     jones.create_config('parent/child2', CONFIG['child2'])
     jones.create_config('parent/child2/subchild1', CONFIG['subchild1'])
-    for env in ASSOCIATIONS:
-        jones.assoc_host(ASSOCIATIONS[env], env)
+    for host in ASSOCIATIONS:
+        jones.assoc_host(host, ASSOCIATIONS[host])

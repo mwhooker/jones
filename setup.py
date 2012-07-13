@@ -17,16 +17,17 @@ limitations under the License.
 from setuptools import setup
 
 
-VERSION = '0.1'
+VERSION = '0.2'
 NAME = 'jones'
 
 install_requires = [
     'zc-zookeeper-static',
+    'kazoo>=0.2dev'
 ]
 
 web_requires = install_requires + [
     'flask',
-    'zc.zk'
+    'raven'
 ]
 
 tests_require = web_requires + [

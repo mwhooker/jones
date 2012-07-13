@@ -42,7 +42,7 @@ It's also incredibly simple (only 30 lines), so it should be easy to customize. 
     'value'
 
    * **service:** the name of the service you want config for.
-   * **zk:** An instance of zc.zk.ZooKeeper.
+   * **zk:** An instance of kazoo.client.KazooClient
    * **cb:** Optional. A method to be called with a config dict every time it changes.
    * **hosname:** Optional. A key in the _associations_ map. By default JonesClient uses socket.getfqdn()
 

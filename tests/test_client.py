@@ -15,51 +15,65 @@ limitations under the License.
 """
 
 from __future__ import unicode_literals
-from unittest import TestCase
-import zc.zk
-from zc.zk import testing
+import threading
 
 from tests import fixture
 from jones.jones import Jones
 from jones.client import JonesClient
+from kazoo.testing import KazooTestCase
 
 
-class TestJonesClient(TestCase):
+"""
+Because Kazoo's testing framework actually shells out to the local zookeeper
+install, we've introduced real world uncertainty to our tests. A side-effect
+of which we are attempting to work around by introduce wall-clock delays.
+These are designed to allow time for zookeeper to invoke our callbacks before
+testing for expected results.
+
+The amount of wall-clock delay is reflected in the below magic number.
+
+TODO: replace with threading.Event
+"""
+
+MAGIC_NUMBER = 0.2
+
+class TestJonesClient(KazooTestCase):
 
     def setUp(self):
+        super(TestJonesClient, self).setUp()
         self.config = None
         self.service = 'testservice'
         self.hostname = '127.0.0.2'
+        self.ev = threading.Event()
 
-        cs = 'zookeeper.example.com:2181'
-        testing.setUp(self, connection_string=cs)
-        self.zk = zc.zk.ZooKeeper(cs)
-        self.jones = Jones(self.service, self.zk)
+        self.jones = Jones(self.service, self.client)
         fixture.init_tree(self.jones)
-        self.client = JonesClient(self.service, self.zk, self.default_cb,
-                                  self.hostname)
+        self.jones_client = JonesClient(self.service, self.client, self.default_cb,
+                                        self.hostname)
 
     def default_cb(self, config):
         self.config = config
-
-    def tearDown(self):
-        testing.tearDown(self)
+        self.ev.set()
 
     def test_gets_config(self):
 
         self.assertEquals(self.config, fixture.CHILD1)
         fixt = "I changed"
+        self.ev.clear()
         self.jones.set_config('parent', {'k': fixt}, -1)
+        self.ev.wait(0.5)
         self.assertEquals(self.config['k'], fixt)
 
     def test_isa_dict(self):
-
-        self.assertEquals(self.client, fixture.CHILD1)
+        self.ev.wait(0.5)
+        self.assertEquals(self.jones_client, fixture.CHILD1)
 
     def test_responds_to_remap(self):
         """test that changing the associations updates config properly."""
 
+        self.ev.clear()
         self.jones.assoc_host(self.hostname, 'parent')
+        self.ev.wait(0.5)
         self.assertEquals(self.config, fixture.PARENT)
 
     def test_defaults_to_root(self):
@@ -70,10 +84,20 @@ class TestJonesClient(TestCase):
         host under our control to zk.
         """
 
+        ev = threading.Event()
         hostname = '0.0.0.0'
-        self.client = JonesClient(self.service, self.zk,
-                             self.default_cb, hostname)
-        self.assertTrue(hostname not in fixture.ASSOCIATIONS.values())
-        self.assertEquals(self.config, fixture.CONFIG['root'])
+        self.assertTrue(hostname not in fixture.ASSOCIATIONS.keys())
+
+        def cb(config):
+            ev.set()
+
+        client = JonesClient(self.service, self.client, cb, hostname)
+        ev.wait(0.5)
+        self.assertEquals(client.config, fixture.CONFIG['root'])
+        self.assertTrue(ev.isSet())
+
+        ev.clear()
         self.jones.assoc_host(hostname, 'parent')
-        self.assertEquals(self.config, fixture.PARENT)
+        ev.wait(0.5)
+        self.assertEquals(client.config, fixture.PARENT)
+        self.assertTrue(ev.isSet())
