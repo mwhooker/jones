@@ -28,4 +28,4 @@ implement:
 test:
   ZNodeLink (DONEish)
 fix:
- travis-ci
+ travis-ci (DONE)
