@@ -25,7 +25,7 @@ class JonesClient(Mapping):
     def __init__(self, service, zk, cb=None, hostname=None):
         """
         service: name of the service to get config for.
-        zk: zc.zk object.
+        zk: KazooClient object.
         cb: optional method to be called with config when it changes.
         hostname: Node to get associated configuration data for.
         """
