@@ -97,14 +97,6 @@ class Jones(object):
         self.view_path = "%s/views" % self.root
         self.associations = ZNodeMap(zk, "%s/nodemaps" % self.root)
 
-        """
-        self.zk.ensure_path(self.conf_path)
-        try:
-            self.zk.create(self.conf_path, '{}', makepath=True)
-        except NodeExistsException:
-            pass
-        """
-
         self._get_env_path = partial(self._get_path_by_env, self.conf_path)
         self._get_view_path = partial(self._get_path_by_env, self.view_path)
 
