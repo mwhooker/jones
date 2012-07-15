@@ -56,17 +56,9 @@ class TestJonesClient(KazooTestCase):
         self.ev.set()
 
     def test_gets_config(self):
-
-        self.assertEquals(self.config, fixture.CHILD1)
-        fixt = "I changed"
-        self.ev.clear()
-        self.jones.set_config('parent', {'k': fixt}, -1)
-        self.ev.wait(0.5)
-        self.assertEquals(self.config['k'], fixt)
-
-    def test_isa_dict(self):
         self.ev.wait(0.5)
         self.assertEquals(self.jones_client, fixture.CHILD1)
+        self.assertEquals(self.config, fixture.CHILD1)
 
     def test_responds_to_remap(self):
         """test that changing the associations updates config properly."""
