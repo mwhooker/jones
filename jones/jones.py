@@ -213,7 +213,7 @@ class Jones(object):
         )
 
     def delete_all(self):
-        self.zk.recursive_delete(self.root)
+        self.zk.delete(self.root, recursive=True)
 
     def get_child_envs(self, env=None):
         prefix = self._get_env_path(env)
