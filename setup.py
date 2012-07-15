@@ -44,7 +44,7 @@ if __name__ == '__main__':
         author='Matthew Hooker',
         author_email='mwhooker@gmail.com',
         url='https://github.com/disqus/jones',
-        description='Report tool for analytics.',
+        description='Configuration frontend for Zookeeper.',
         license='Apache License 2.0',
         py_modules = ['jones.client'],
         zip_safe=False,
