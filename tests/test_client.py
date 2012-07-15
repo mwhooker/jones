@@ -101,3 +101,18 @@ class TestJonesClient(KazooTestCase):
         ev.wait(0.5)
         self.assertEquals(client.config, fixture.PARENT)
         self.assertTrue(ev.isSet())
+
+    def test_works_if_zk_down(self):
+        self.assertEquals(self.config, fixture.CHILD1)
+        self.expire_session()
+        self.assertEquals(self.config, fixture.CHILD1)
+
+    def test_resets_watches(self):
+        def test(fixt):
+            self.ev.clear()
+            self.jones.set_config('parent', {'k': fixt}, -1)
+            self.ev.wait(0.5)
+            self.assertEquals(self.config['k'], fixt)
+
+        for fixt in ('a', 'b', 'c'):
+            test(fixt)
