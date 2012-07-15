@@ -34,7 +34,6 @@ tests_require = web_requires + [
     'nose',
     'unittest2',
     'mock',
-    'zope.testing'
 ]
 
 if __name__ == '__main__':
