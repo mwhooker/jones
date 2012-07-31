@@ -31,11 +31,9 @@ These are designed to allow time for zookeeper to invoke our callbacks before
 testing for expected results.
 
 The amount of wall-clock delay is reflected in the below magic number.
-
-TODO: replace with threading.Event
 """
 
-MAGIC_NUMBER = 0.2
+MAGIC_NUMBER = 0.5
 
 class TestJonesClient(KazooTestCase):
 
@@ -56,7 +54,7 @@ class TestJonesClient(KazooTestCase):
         self.ev.set()
 
     def test_gets_config(self):
-        self.ev.wait(0.5)
+        self.ev.wait(MAGIC_NUMBER)
         self.assertEquals(self.jones_client, fixture.CHILD1)
         self.assertEquals(self.config, fixture.CHILD1)
 
@@ -65,7 +63,7 @@ class TestJonesClient(KazooTestCase):
 
         self.ev.clear()
         self.jones.assoc_host(self.hostname, 'parent')
-        self.ev.wait(0.5)
+        self.ev.wait(MAGIC_NUMBER)
         self.assertEquals(self.config, fixture.PARENT)
 
     def test_defaults_to_root(self):
@@ -84,13 +82,13 @@ class TestJonesClient(KazooTestCase):
             ev.set()
 
         client = JonesClient(self.service, self.client, cb, hostname)
-        ev.wait(0.5)
+        ev.wait(MAGIC_NUMBER)
         self.assertEquals(client.config, fixture.CONFIG['root'])
         self.assertTrue(ev.isSet())
 
         ev.clear()
         self.jones.assoc_host(hostname, 'parent')
-        ev.wait(0.5)
+        ev.wait(MAGIC_NUMBER)
         self.assertEquals(client.config, fixture.PARENT)
         self.assertTrue(ev.isSet())
 
@@ -103,7 +101,7 @@ class TestJonesClient(KazooTestCase):
         def test(fixt):
             self.ev.clear()
             self.jones.set_config('parent', {'k': fixt}, -1)
-            self.ev.wait(0.5)
+            self.ev.wait(MAGIC_NUMBER)
             self.assertEquals(self.config['k'], fixt)
 
         for fixt in ('a', 'b', 'c'):
