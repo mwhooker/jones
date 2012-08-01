@@ -22,7 +22,7 @@ NAME = 'jones'
 
 install_requires = [
     'zc-zookeeper-static',
-    'kazoo>=0.2dev'
+    'kazoo>=0.2b1'
 ]
 
 web_requires = install_requires + [
