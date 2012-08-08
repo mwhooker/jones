@@ -22,3 +22,4 @@ DEBUG = True
 TESTING = True
 SECRET_KEY = 'developement key'
 ZK_CONNECTION_STRING = 'localhost:2181'
+ZK_DIGEST_PASSWORD = 'changeme'

@@ -19,6 +19,7 @@ from flask import Flask, jsonify, redirect, render_template, request, url_for
 from raven.contrib.flask import Sentry
 from werkzeug.contrib.fixers import ProxyFix
 from jinja2 import Markup
+from kazoo.security import make_acl, make_digest_acl
 from kazoo.client import KazooClient
 from kazoo.exceptions import NoNodeException
 import json
@@ -36,8 +37,18 @@ app.config.from_envvar('JONES_SETTINGS', silent=True)
 if 'SENTRY_DSN' in app.config:
     sentry = Sentry(app)
 
-zk = KazooClient(app.config['ZK_CONNECTION_STRING'])
+# Set up the ACL such that only Jones can write to ZooKeeper.
+jones_acl = make_digest_acl(
+    'Jones', app.config['ZK_DIGEST_PASSWORD'],
+    read=True, write=True, create=True, delete=True
+)
+creator_acl = make_acl('auth', '', all=True)
+zk = KazooClient(
+    app.config['ZK_CONNECTION_STRING'],
+    default_acl=(make_acl('world', 'anyone', read=True), creator_acl)
+)
 zk.connect()
+zk.add_auth('digest', jones_acl['id'])
 zk.ensure_path('/services')
 
 
