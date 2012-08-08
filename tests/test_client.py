@@ -46,7 +46,7 @@ class TestJonesClient(KazooTestCase):
 
         self.jones = Jones(self.service, self.client)
         fixture.init_tree(self.jones)
-        self.jones_client = JonesClient(self.service, self.client, self.default_cb,
+        self.jones_client = JonesClient(self.client, self.service, self.default_cb,
                                         self.hostname)
 
     def default_cb(self, config):
@@ -81,7 +81,7 @@ class TestJonesClient(KazooTestCase):
         def cb(config):
             ev.set()
 
-        client = JonesClient(self.service, self.client, cb, hostname)
+        client = JonesClient(self.client, self.service, cb, hostname)
         ev.wait(MAGIC_NUMBER)
         self.assertEquals(client.config, fixture.CONFIG['root'])
         self.assertTrue(ev.isSet())

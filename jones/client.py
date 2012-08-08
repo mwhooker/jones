@@ -20,16 +20,20 @@ import json
 
 
 class JonesClient(Mapping):
-    """An example client for accessing config stored by Jones."""
+    """An example client for accessing config stored by Jones.
 
-    def __init__(self, service, zk, cb=None, hostname=None):
-        """
-        service: name of the service to get config for.
-        zk: KazooClient object.
-        cb: optional method to be called with config when it changes.
-        hostname: Node to get associated configuration data for.
-        """
+    :param zk: zookeeper connection.
+    :type zk: :class:`kazoo.client.KazooClient`
+    :param service: name of the service to get config for.
+    :type service: string.
+    :param cb: optional method to be called with config when it changes.
+    :type param: function.
+    :param hostname: Node to get associated configuration data for.
+    :type hostname: string.
 
+    """
+
+    def __init__(self, zk, service, cb=None, hostname=None):
         self.service = service
         self.zk = zk
         self.cb = cb
