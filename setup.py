@@ -17,12 +17,12 @@ limitations under the License.
 from setuptools import setup
 
 
-VERSION = '0.3.1'
+VERSION = '0.3.2'
 NAME = 'jones'
 
 install_requires = [
     'zc-zookeeper-static',
-    'kazoo'
+    'kazoo==0.3'
 ]
 
 web_requires = install_requires + [
@@ -34,10 +34,6 @@ tests_require = web_requires + [
     'nose',
     'unittest2',
     'mock',
-]
-
-dependency_links = [
-    'https://github.com/python-zk/kazoo/zipball/master#egg=kazoo',
 ]
 
 if __name__ == '__main__':
@@ -59,5 +55,4 @@ if __name__ == '__main__':
         },
         test_suite='nose.collector',
         include_package_data=True,
-        dependency_links=dependency_links,
     )
