@@ -16,9 +16,9 @@ limitations under the License.
 
 from __future__ import unicode_literals
 import json
-import zookeeper
 
-from kazoo.testing import KazooTestCase
+from kazoo.exceptions import BadVersionException, NoNodeException
+from kazoo.testing.harness import KazooTestCase
 from tests import fixture
 
 from jones.jones import Jones
@@ -82,7 +82,7 @@ class TestJones(KazooTestCase):
         )
 
         self.assertRaises(
-            zookeeper.BadVersionException,
+            BadVersionException,
             self.jones.set_config,
             None, {"foo": "bag"}, 4,
         )
@@ -93,19 +93,19 @@ class TestJones(KazooTestCase):
         self.jones.delete_config(env, -1)
 
         self.assertRaises(
-            zookeeper.NoNodeException,
+            NoNodeException,
             self.jones.get_config,
             '127.0.0.2'
         )
 
         self.assertRaises(
-            zookeeper.NoNodeException,
+            NoNodeException,
             self.jones.get_config_by_env,
             env
         )
 
         self.assertRaises(
-            zookeeper.NoNodeException,
+            NoNodeException,
             self.jones.get_view_by_env,
             env
         )
@@ -161,7 +161,7 @@ class TestJones(KazooTestCase):
 
         self.jones.delete_all()
         self.assertRaises(
-            zookeeper.NoNodeException,
+            NoNodeException,
             self.client.get,
             self.jones.root
         )

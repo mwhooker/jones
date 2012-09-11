@@ -16,13 +16,11 @@ limitations under the License.
 
 from setuptools import setup
 
-
-VERSION = '0.3.2'
+VERSION = '0.4'
 NAME = 'jones'
 
 install_requires = [
-    'zc-zookeeper-static',
-    'kazoo==0.3'
+    'kazoo==0.5'
 ]
 
 web_requires = install_requires + [

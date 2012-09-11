@@ -63,7 +63,7 @@ class ZNodeMap(object):
             return dict(l.split(self.SEPARATOR) for l in d.split('\n'))
 
         data, stat = self.zk.get(self.path)
-        return _deserialize(data), stat.version
+        return _deserialize(data.decode('utf8')), stat.version
 
     def _set(self, data, version):
         """serialize and set data to self.path."""
@@ -71,7 +71,7 @@ class ZNodeMap(object):
         def _serialize(d):
             return '\n'.join(self.SEPARATOR.join((k, d[k])) for k in d)
 
-        self.zk.set(self.path, _serialize(data), version)
+        self.zk.set(self.path, _serialize(data).encode('utf8'), version)
 
 
 class Jones(object):
