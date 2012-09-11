@@ -58,6 +58,11 @@ class TestJonesClient(KazooTestCase):
         self.assertEquals(self.jones_client, fixture.CHILD1)
         self.assertEquals(self.config, fixture.CHILD1)
 
+    def test_default_value(self):
+        self.ev.wait(MAGIC_NUMBER)
+        self.assertEquals(self.jones_client.get('a'), fixture.CHILD1['a'])
+        self.assertEquals(self.jones_client.get('notinhere', 1), 1)
+
     def test_responds_to_remap(self):
         """test that changing the associations updates config properly."""
 
