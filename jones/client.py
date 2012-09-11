@@ -14,9 +14,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-import socket
 from collections import Mapping
+from kazoo.exceptions import NoNodeException
+
+import socket
 import json
+
+
+class EnvironmentNotFoundException(Exception): pass
 
 
 class JonesClient(Mapping):
@@ -53,7 +58,10 @@ class JonesClient(Mapping):
                 return {}
             return dict(l.split(' -> ') for l in d.split('\n'))
 
-        nodemap, stat = self.zk.get(self.nodemap_path, self._get_config)
+        try:
+            nodemap, stat = self.zk.get(self.nodemap_path, self._get_config)
+        except NoNodeException:
+            raise EnvironmentNotFoundException()
 
         try:
             conf_path = _deserialize(nodemap)[self.hostname]

@@ -19,7 +19,7 @@ import threading
 
 from tests import fixture
 from jones.jones import Jones
-from jones.client import JonesClient
+from jones.client import JonesClient, EnvironmentNotFoundException
 from kazoo.testing import KazooTestCase
 
 
@@ -62,6 +62,10 @@ class TestJonesClient(KazooTestCase):
         self.ev.wait(MAGIC_NUMBER)
         self.assertEquals(self.jones_client.get('a'), fixture.CHILD1['a'])
         self.assertEquals(self.jones_client.get('notinhere', 1), 1)
+
+    def test_raises_with_no_environment(self):
+        with self.assertRaises(EnvironmentNotFoundException):
+            JonesClient(self.client, 'newservice')
 
     def test_responds_to_remap(self):
         """test that changing the associations updates config properly."""
