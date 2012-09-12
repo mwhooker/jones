@@ -64,8 +64,11 @@ class TestJonesClient(KazooTestCase):
         self.assertEquals(self.jones_client.get('notinhere', 1), 1)
 
     def test_raises_with_no_environment(self):
-        with self.assertRaises(EnvironmentNotFoundException):
-            JonesClient(self.client, 'newservice')
+        self.assertRaises(
+            EnvironmentNotFoundException,
+            JonesClient,
+            self.client, 'newservice'
+        )
 
     def test_responds_to_remap(self):
         """test that changing the associations updates config properly."""
