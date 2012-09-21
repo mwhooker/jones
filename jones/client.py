@@ -15,13 +15,14 @@ limitations under the License.
 """
 
 from collections import Mapping
-from kazoo.exceptions import NoNodeException
+from kazoo.recipe.watchers import DataWatch
 
 import socket
 import json
 
 
-class EnvironmentNotFoundException(Exception): pass
+class EnvironmentNotFoundException(Exception):
+    pass
 
 
 class JonesClient(Mapping):
@@ -49,30 +50,40 @@ class JonesClient(Mapping):
 
         self.nodemap_path = "/services/%s/nodemaps" % service
 
-        self._get_config()
+        self.nodemap_watcher = DataWatch(
+            self.zk, self.nodemap_path,
+            self._nodemap_changed
+        )
 
-    def _get_config(self, *args):
+    def _nodemap_changed(self, data, stat):
+        """Called when the nodemap changes."""
 
-        def _deserialize(d):
-            if not len(d):
-                return {}
-            return dict(l.split(' -> ') for l in d.split('\n'))
-
-        try:
-            nodemap, stat = self.zk.get(self.nodemap_path, self._get_config)
-        except NoNodeException:
-            raise EnvironmentNotFoundException()
+        if not stat:
+            raise EnvironmentNotFoundException(self.nodemap_path)
 
         try:
-            conf_path = _deserialize(nodemap)[self.hostname]
+            conf_path = self._deserialize_nodemap(data)[self.hostname]
         except KeyError:
             conf_path = '/services/%s/conf' % self.service
 
-        config, stat = self.zk.get(conf_path, self._get_config)
-        self.config = json.loads(config)
+        self.config_watcher = DataWatch(
+            self.zk, conf_path,
+            self._config_changed
+        )
+
+    def _config_changed(self, data, stat):
+        """Called when config changes."""
+
+        self.config = json.loads(data)
 
         if self.cb:
             self.cb(self.config)
+
+    @staticmethod
+    def _deserialize_nodemap(d):
+        if not len(d):
+            return {}
+        return dict(l.split(' -> ') for l in d.split('\n'))
 
     def __getitem__(self, key):
         return self.config[key]
