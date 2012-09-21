@@ -144,7 +144,7 @@ class TestJones(KazooTestCase):
         env = None
         self.jones.create_config(env, {})
         self.assertEquals(self.jones.get_associations(env), {})
-        self.assertEquals(self.jones.get_view_by_env(env)[1], {})
+        self.assertEquals(self.jones.get_view_by_env(env), {})
         self.assertEquals(self.jones.get_config_by_env(env)[1], {})
         self.assertEquals(self.jones.get_child_envs(env), [''])
 

@@ -121,7 +121,7 @@ def service_get(env, jones):
     except NoNodeException:
         return redirect(url_for('service', service=jones.service))
 
-    view = jones.get_view_by_env(env)[1]
+    view = jones.get_view_by_env(env)
     return render_template('service.html',
                            env=env or '',
                            version=version,

@@ -168,14 +168,23 @@ class Jones(object):
         )
 
     def get_config_by_env(self, env):
+        """
+        Get the config dictionary by `env`.
+
+        Returns a 2-tuple like (version, data).
+
+        """
         return self._get(
             self._get_env_path(env)
         )
 
     def get_view_by_env(self, env):
-        return self._get(
-            self._get_view_path(env)
-        )
+        """
+        Returns the view of `env`.
+
+        """
+        version, data = self._get(self._get_view_path(env))
+        return data
 
     def assoc_host(self, hostname, env):
         """
