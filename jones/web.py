@@ -49,7 +49,7 @@ zk = KazooClient(
         make_acl('auth', '', all=True)
     )
 )
-zk.connect()
+zk.start()
 zk.add_auth('digest', jones_credential)
 zk.ensure_path('/services')
 
