@@ -71,29 +71,35 @@ var config = {{ config | tojson |safe }};
             </table>
 
             <h4>Associations</h4>
-            <div class="well" id="associations">
-                <ul class="unstyled">
-                    {% for hostname in associations %}
-                    <li style="padding: 2px;">
-                    {# TODO: only eval this loop if assocs[hostname] == this enviornment. #}
-                    <span>{{ hostname }}</span>
-                    <span class="pull-right">
-                        <button class="btn btn-mini del-assoc" data-hostname="{{ hostname }}"
-                            data-loading-text="Deleting…">Delete</button>
-                    </span>
-                    </li>
-                    {% else %}
-                    <li>None</li>
-                    {% endfor %}
-                </ul>
-                <div class="hide" id="add-assoc">
-                    <input type="text" class="input-medium" id="hostname">
-                    <button type="submit" class="btn btn-mini pull-right"
-                        data-loading-text="Associating…">
-                        Associate</button>
+            {% if not env %}
+                <div class="alert alert-info">
+                    All associations default to root.
                 </div>
-                <button autocomplete="off" class="btn btn-mini">Add</button>
-            </div>
+            {% else %}
+                <div class="well" id="associations">
+                    <ul class="unstyled">
+                        {% for hostname in associations %}
+                        <li style="padding: 2px;">
+                        {# TODO: only eval this loop if assocs[hostname] == this enviornment. #}
+                        <span>{{ hostname }}</span>
+                        <span class="pull-right">
+                            <button class="btn btn-mini del-assoc" data-hostname="{{ hostname }}"
+                                data-loading-text="Deleting…">Delete</button>
+                        </span>
+                        </li>
+                        {% else %}
+                        <li>None</li>
+                        {% endfor %}
+                    </ul>
+                    <div class="hide" id="add-assoc">
+                        <input type="text" class="input-medium" id="hostname">
+                        <button type="submit" class="btn btn-mini pull-right"
+                            data-loading-text="Associating…">
+                            Associate</button>
+                    </div>
+                    <button autocomplete="off" class="btn btn-mini">Add</button>
+                </div>
+            {% endif %}
 
             <h4>Inherited View</h4>
             <pre class="prettyprint lang-javascript">{{ view | as_json(2) }}</pre>

@@ -121,7 +121,7 @@ class TestJones(KazooTestCase):
 
     def test_get_associations(self):
         fixture.init_tree(self.jones)
-        assocs = self.jones.get_associations()
+        assocs = self.jones.associations.get_all()
         for host in fixture.ASSOCIATIONS:
             self.assertEquals(
                 assocs[host],
@@ -136,14 +136,14 @@ class TestJones(KazooTestCase):
             self.jones.get_config,
             '127.0.0.3'
         )
-        self.assertTrue(len(self.jones.get_associations()) > 0)
+        self.assertTrue(len(self.jones.associations.get_all()) > 0)
 
     def test_create_service(self):
-        # Test that creating a service creates stub conf/view/nodemaps
+        """Test that creating a service creates stub conf/view/nodemaps."""
 
         env = None
         self.jones.create_config(env, {})
-        self.assertEquals(self.jones.get_associations(env), {})
+        self.assertEquals(self.jones.get_associations(env), None)
         self.assertEquals(self.jones.get_view_by_env(env), {})
         self.assertEquals(self.jones.get_config_by_env(env)[1], {})
         self.assertEquals(self.jones.get_child_envs(env), [''])
@@ -154,7 +154,7 @@ class TestJones(KazooTestCase):
         self.assertTrue(self.jones.exists())
 
     def test_delete_service(self):
-        # Test that deleting a service removes all sub-nodes
+        """Test that deleting a service removes all sub-nodes."""
 
         env = None
         self.jones.create_config(env, {})

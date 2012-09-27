@@ -199,7 +199,9 @@ class Jones(object):
 
     def get_associations(self, env=None):
         """
-        Get all the associations for this env, or all if env is None.
+        Get all the associations for this env.
+
+        Root cannot have associations, so return None for root.
 
         returns a map of hostnames to environments.
         """
@@ -207,7 +209,7 @@ class Jones(object):
         associations = self.associations.get_all()
 
         if not env:
-            return associations
+            return None
         return [assoc for assoc in associations
                 if associations[assoc] == self._get_view_path(env)]
 
