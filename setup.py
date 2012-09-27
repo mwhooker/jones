@@ -15,8 +15,8 @@ limitations under the License.
 """
 
 from setuptools import setup
+from jones import client
 
-VERSION = '0.5'
 NAME = 'jones'
 
 install_requires = [
@@ -37,7 +37,7 @@ tests_require = web_requires + [
 if __name__ == '__main__':
     setup(
         name=NAME,
-        version=VERSION,
+        version=client.__version__,
         author='Matthew Hooker',
         author_email='mwhooker@gmail.com',
         url='https://github.com/disqus/jones',
@@ -49,7 +49,8 @@ if __name__ == '__main__':
         tests_require=tests_require,
         extras_require={
             'test': tests_require,
-            'web': web_requires
+            'web': web_requires,
+            'docs': ['sphinx'] + tests_require
         },
         test_suite='nose.collector',
         include_package_data=True,

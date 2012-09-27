@@ -14,6 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
+__version__ = 0.5
 from collections import Mapping
 from kazoo.recipe.watchers import DataWatch
 
