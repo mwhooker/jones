@@ -43,7 +43,7 @@ if __name__ == '__main__':
         url='https://github.com/disqus/jones',
         description='Configuration frontend for Zookeeper.',
         license='Apache License 2.0',
-        py_modules = ['jones.client'],
+        py_modules=['jones.client'],
         zip_safe=False,
         install_requires=install_requires,
         tests_require=tests_require,
