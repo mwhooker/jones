@@ -16,7 +16,7 @@ limitations under the License.
 
 from setuptools import setup
 
-VERSION = '0.5'
+VERSION = '0.5.1'
 NAME = 'jones'
 
 install_requires = [
