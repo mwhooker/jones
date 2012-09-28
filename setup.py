@@ -20,7 +20,7 @@ VERSION = '0.5'
 NAME = 'jones'
 
 install_requires = [
-    'kazoo>=0.6'
+    'kazoo==0.5'
 ]
 
 web_requires = install_requires + [
