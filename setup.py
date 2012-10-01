@@ -16,11 +16,11 @@ limitations under the License.
 
 from setuptools import setup
 
-VERSION = '0.5.1'
+VERSION = '0.5.2'
 NAME = 'jones'
 
 install_requires = [
-    'kazoo>=0.6'
+    'kazoo==0.6'
 ]
 
 web_requires = install_requires + [
