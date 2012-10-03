@@ -36,6 +36,7 @@ It's also incredibly simple (only 30 lines), so it should be easy to customize. 
 **Use:**
 
     from jones.client import JonesClient
+
     # Initialize jones client with kazoo connection, and service.
     jones = JonesClient(zk, 'da')
     client['key']
@@ -43,21 +44,21 @@ It's also incredibly simple (only 30 lines), so it should be easy to customize. 
     client.get('missingkey', 'default')
     'default'
 
-    <dl>
-      <dt>zk</dt>
-      <dd>An instance of kazoo.client.KazooClient.</dd>
-      <dt>service</dt>
-      <dd>The name of the service you want config for.</dd>
-    </dl>
+<dl>
+  <dt>zk</dt>
+  <dd>An instance of kazoo.client.KazooClient.</dd>
+  <dt>service</dt>
+  <dd>The name of the service you want config for.</dd>
+</dl>
 
-    The JonesClient object also takes an optional callback and association.
+The JonesClient object also takes an optional callback and association.
 
-    <dl>
-      <dt>cb</dt>
-      <dd>A method to be called with a config dict every time it changes.</dd>
-      <dt>association</dt>
-      <dd>A key in the _associations_ map. By default JonesClient uses socket.getfqdn().</dd>
-    </dl>
+<dl>
+  <dt>cb</dt>
+  <dd>A method to be called with a config dict every time it changes.</dd>
+  <dt>association</dt>
+  <dd>A key in the _associations_ map. By default JonesClient uses socket.getfqdn().</dd>
+</dl>
 
 Design
 ------
