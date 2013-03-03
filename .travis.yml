@@ -5,7 +5,7 @@ python:
 
 notifications:
   email:
-    - mwhooker@disqus.com
+    - mwhooker@gmail.com
 
 before_install:
     - sudo apt-get update >/dev/null 2>&1
