@@ -145,7 +145,7 @@ class TestJones(KazooTestCase):
         self.jones.create_config(env, {})
         self.assertEquals(self.jones.get_associations(env), None)
         self.assertEquals(self.jones.get_view_by_env(env), {})
-        self.assertEquals(self.jones.get_config_by_env(env), {})
+        self.assertEquals(self.jones.get_config_by_env(env)[1], {})
         self.assertEquals(self.jones.get_child_envs(env), [''])
 
     def test_exists_reflectes_creation(self):
