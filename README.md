@@ -124,7 +124,7 @@ Glossary
 
 Screenshot
 ----------
-![Example](http://code.disqus.com/jones/docs/img/testservice.png)
+![Example](http://mwhooker.github.com/jones/docs/img/testservice.png)
 
-  [1]: http://travis-ci.org/#!/disqus/jones
-  [2]: https://secure.travis-ci.org/disqus/jones.png?branch=master
+  [1]: https://travis-ci.org/mwhooker/jones
+  [2]: https://travis-ci.org/mwhooker/jones.png?branch=master

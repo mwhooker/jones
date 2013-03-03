@@ -41,7 +41,7 @@ if __name__ == '__main__':
         version=VERSION,
         author='Matthew Hooker',
         author_email='mwhooker@gmail.com',
-        url='https://github.com/disqus/jones',
+        url='https://github.com/mwhooker/jones',
         description='Configuration frontend for Zookeeper.',
         license='Apache License 2.0',
         py_modules=['jones.client'],
