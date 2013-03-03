@@ -22,6 +22,7 @@ from jinja2 import Markup
 from kazoo.security import make_acl, make_digest_acl_credential
 from kazoo.client import KazooClient
 from kazoo.exceptions import NoNodeException
+from itertools import repeat, izip, imap
 import json
 
 from jones import Jones
@@ -121,16 +122,26 @@ def service_get(env, jones):
     except NoNodeException:
         return redirect(url_for('service', service=jones.service))
 
-    view = jones.get_view_by_env(env)
-    return render_template('service.html',
-                           env=env or '',
-                           version=version,
-                           children=zip(children, map(is_leaf, children)),
-                           config=config,
-                           view=view,
-                           service=jones.service,
-                           associations=jones.get_associations(env)
-                          )
+    childs = imap(dict, izip(
+        izip(repeat('env'),
+            imap(lambda env: env if len(env) else "/",
+                children)),
+        izip(repeat('is_leaf'), imap(is_leaf, children))))
+
+    vals = {
+        "env": env or '',
+        "version": version,
+        "children": list(childs),
+        "config": config,
+        "view": jones.get_view_by_env(env),
+        "service": jones.service,
+        "associations": jones.get_associations(env)
+    }
+    if request_wants('application/json'):
+        return jsonify(vals)
+    else:
+        return render_template('service.html', **vals)
+
 
 SERVICE = {
     'get': service_get,
