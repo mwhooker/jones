@@ -164,10 +164,13 @@ def service(service, env):
 
 # TODO: what if we have a path called association?
 @app.route('/service/<string:service>/association/<string:assoc>',
-           methods=['PUT', 'DELETE'])
+           methods=['GET', 'PUT', 'DELETE'])
 def association(service, assoc):
     jones = Jones(service, zk)
 
+    if request.method == 'GET':
+        if request_wants('application/json'):
+            return jsonify(jones.get_config(assoc))
     if request.method == 'PUT':
         jones.assoc_host(assoc, request.form['env'])
         return service, 201

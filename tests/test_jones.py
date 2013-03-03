@@ -45,7 +45,7 @@ class TestJones(KazooTestCase):
         fixture.init_tree(self.jones)
         self.assertEquals(
             fixture.CHILD1,
-            self.jones.get_config('127.0.0.2')[1]
+            self.jones.get_config('127.0.0.2')
         )
 
     def test_overwrites(self):
@@ -65,7 +65,7 @@ class TestJones(KazooTestCase):
         #self.client.print_tree('/services')
 
         for i in ('127.0.0.1', '127.0.0.2'):
-            _, config = self.jones.get_config(i)
+            config = self.jones.get_config(i)
             self.assertEquals(config.get('b'), [1, 2, 3],
                              "Host %s didn't inherit properly." % i)
             self.assertEquals(config.get('new'), 'key',
@@ -145,7 +145,7 @@ class TestJones(KazooTestCase):
         self.jones.create_config(env, {})
         self.assertEquals(self.jones.get_associations(env), None)
         self.assertEquals(self.jones.get_view_by_env(env), {})
-        self.assertEquals(self.jones.get_config_by_env(env)[1], {})
+        self.assertEquals(self.jones.get_config_by_env(env), {})
         self.assertEquals(self.jones.get_child_envs(env), [''])
 
     def test_exists_reflectes_creation(self):
