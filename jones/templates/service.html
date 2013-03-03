@@ -41,25 +41,20 @@ var config = {{ config | tojson |safe }};
             <h4>Environments</h4>
             <table class="env-table table table-condensed table-striped">
                 <tbody>
-                {% for child, is_leaf in children %}
-                    {% set ischild = (child[1:] == (env or '')) %}
-                    {% set child_url = "/service/%s%s"|format(service, child) %}
-                    {% if child %}
-                        {% set child_pretty = child %}
-                    {% else %}
-                        {% set child_pretty = "/" %}
-                    {% endif %}
+                {% for child in children %}
+                    {% set ischild = (child["env"][1:] == (env or '')) %}
+                    {% set child_url = "/service/%s%s"|format(service, child["env"]) %}
 
                     <tr>
                         <td>
                             {% if ischild%}
-                            <span><strong>{{ child_pretty }}</strong></span>
+                            <span><strong>{{ child["env"] }}</strong></span>
                             {% else %}
                             {# TODO: link span shoud go all the way to buttons. for clicking.#}
-                            <a href="{{ child_url }}"><span>{{ child_pretty }}</span></a>
+                            <a href="{{ child_url }}"><span>{{ child["env"] }}</span></a>
                             {% endif %}
                             <span class="pull-right">
-                                {% if is_leaf %}
+                                {% if child["is_leaf"] %}
                                 <a class="btn del-env btn-mini" href="{{ child_url }}">Delete</a>
                                 {% endif %}
                                 <a class="btn add-env btn-mini" data-env="{{ child_url }}">Add Child</a>

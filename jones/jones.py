@@ -159,13 +159,13 @@ class Jones(object):
 
     def get_config(self, hostname):
         """
-        Returns a 2-tuple like (version, data).
+        Returns a configuration for hostname.
 
-        Version must be used with future calls to set_config.
         """
-        return self._get(
+        version, config = self._get(
             self.associations.get(hostname)
         )
+        return config
 
     def get_config_by_env(self, env):
         """
