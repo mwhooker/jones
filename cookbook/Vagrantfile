@@ -1,0 +1,45 @@
+require 'berkshelf/vagrant'
+
+Vagrant::Config.run do |config|
+  config.vm.host_name = "jones-cookbook-berkshelf"
+
+  config.vm.box = "lucid64"
+  config.vm.box_url = "http://files.vagrantup.com/lucid64.box"
+
+  # Assign this VM to a host-only network IP, allowing you to access it
+  # via the IP. Host-only networks can talk to the host machine as well as
+  # any other machines on the same network, but cannot be accessed (through this
+  # network interface) by any external networks.
+  config.vm.network :hostonly, "33.33.33.10"
+
+  config.ssh.max_tries = 40
+  config.ssh.timeout   = 120
+
+
+  config.vm.provision :chef_solo do |chef|
+    chef.json = {
+      :java => {
+        :install_flavor => "oracle",
+        :oracle => {
+          :accept_oracle_download_terms => true
+        }
+      },
+      :exhibitor => {
+        :opts => {
+          :configtype => "file",
+          :s3backup => "false"
+        },
+        :snapshot_dir => "/tmp/zookeeper_snapshots",
+        :transaction_dir => "/tmp/zookeeper_transactions",
+        :log_index_dir => "/tmp/zookeeper_log_indexes",
+        :hostname => "http://localhost:8080"
+      }
+    }
+
+    chef.run_list = [
+      "recipe[apt]",
+      "recipe[zookeeper]",
+      "recipe[jones]"
+    ]
+  end
+end
