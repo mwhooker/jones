@@ -9,7 +9,6 @@
 
 
 include_recipe "python"
-# include_recipe "nginx"
 
 user node[:jones][:user] do
   uid node[:jones][:uid]
@@ -64,6 +63,6 @@ end
 
 
 # TODO: there's got to be a better way of deciding if we should use zk_connect attribute or exhibitor
-if not node[:jones][:].is_a? String
+if not node[:jones][:zk_connect].is_a? String
  zk_connect_str(discover_zookeepers(), node[:jones][:zk_chroot))
 end

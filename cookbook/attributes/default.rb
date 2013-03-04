@@ -3,7 +3,7 @@ default[:jones][:user] = "jones"
 default[:jones][:uid] = "61002"
 default[:jones][:group] = "nogroup"
 default[:jones][:zk_chroot] = "jones"
-default[:jones][:zk_connect] = "localhost:2181"
+#default[:jones][:zk_connect] = "localhost:2181"
 
 default[:jones][:mirror] = "https://github.com/mwhooker/jones/archive/#{default[:jones][:version]}.tar.gz"
 default[:jones][:destination] = "/opt/www/jones"
