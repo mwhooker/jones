@@ -40,10 +40,10 @@ template config_path do
   group "root"
   mode "0644"
   # notifies :restart, "service[jones]"
-  variables({
+  variables(
     :config => node[:jones][:config],
     :zk_connect_str => zk_connect_str
-  })
+  )
 end
 
 venv = "#{node[:jones][:destination]}/shared/env"
@@ -79,31 +79,3 @@ application "jones" do
   end
 
 end
-
-# template "gunicorn.upstart.conf" do
-#   path "/etc/init/gunicorn.conf"
-#   source "gunicorn.upstart.conf.erb"
-#   owner "root"
-#   group "root"
-#   mode "0644"
-#   notifies :stop, "service[exhibitor]" # :restart doesn't reload upstart conf
-#   notifies :start, "service[exhibitor]"
-#   variables(
-#       :user => node[:jones][:user],
-#       :bind_address => node[:jones][:gunicorn][:port],
-#       :config_path => "#{node[:jones][:gunicorn][:config_dir]}/jones.py"
-#   )
-# end
-
-
-# python_virtualenv node[:jones][:virtualenv] do
-#   owner "root"
-#   action :create
-# end
-#
-# service "gunicorn" do
-#   provider Chef::Provider::Service::Upstart
-#   supports :start => true, :status => true, :restart => true
-#   action :start
-# end
-

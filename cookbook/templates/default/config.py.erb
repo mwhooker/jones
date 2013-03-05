@@ -1,5 +1,5 @@
-DEBUG = <%= @config['debug'] %>
-TESTING = <%= @config['testing'] %>
-SECRET_KEY = '<%= @config['secret_key'] %>'
-ZK_CONNECTION_STRING = '<%= @zk_connect_string %>'
-ZK_DIGEST_PASSWORD = '<%= @config['zk_digest_password'] %>'
+DEBUG = <%= @config[:debug] %>
+TESTING = <%= @config[:testing] %>
+SECRET_KEY = <%= @config[:secret_key] %>
+ZK_CONNECTION_STRING = <%= @zk_connect_str %>
+ZK_DIGEST_PASSWORD = <%= @config[:zk_digest_password] %>
