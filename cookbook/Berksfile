@@ -1,0 +1,9 @@
+site :opscode
+
+metadata
+
+cookbook "zookeeper", github: "SimpleFinance/chef-zookeeper"
+cookbook "nginx_conf", github: "firebelly/chef-nginx_conf"
+
+# fixes needed in master that are not in most recent version, 1.0.8
+cookbook "application_python", github: "opscode-cookbooks/application_python"
