@@ -17,8 +17,10 @@ default[:jones][:gunicorn][:port] = "8000"
 
 default[:jones][:config][:debug] = "False"
 default[:jones][:config][:testing] = "False"
-default[:jones][:config][:secret_key] = "dev key"
+default[:jones][:config][:secret_key] = 'dev key'
 default[:jones][:config][:zk_digest_password] = "changeme"
 
 default[:python][:distribute_install_py_version] = "2.7"
 default[:python][:install_method] = "package"
+
+override['nginx_conf']['pre_socket'] = 'http://'

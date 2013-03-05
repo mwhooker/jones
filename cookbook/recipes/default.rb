@@ -56,13 +56,14 @@ application "jones" do
   owner node[:jones][:user]
   group node[:jones][:group]
 
+  # TODO: environment not being set.
   gunicorn do
+    environment :JONES_SETTINGS => config_path
     packages ["gevent", "jones[web]"]
     port 8000
     workers node[:cpu][:total] + 1
     backlog 2048
     worker_class "egg:gunicorn#gevent"
-    environment "JONES_SETTINGS" => config_path
     app_module "jones.web:app"
     virtualenv venv
   end
@@ -83,6 +84,6 @@ template config_path do
 end
 
 nginx_conf_file "jones" do
-  socket "128.0.0.1:8000"
+  socket "127.0.0.1:8000"
   server_name "_"
 end
