@@ -1,0 +1,14 @@
+#!upstart
+description "Gunicorn Server"
+
+env USER=<%= @user %>
+
+start on startup
+stop on shutdown
+
+respawn
+
+exec sudo -u $USER sh -c "gunicorn \
+  -c <%= @config_path %> \
+  -b <%= @bind_address %> \
+  jones:app"

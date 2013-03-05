@@ -7,8 +7,9 @@
 # All rights reserved - Do Not Redistribute
 #
 
-
 include_recipe "python"
+include_recipe "gunicorn"
+include_recipe "jones::gunicorn"
 
 user node[:jones][:user] do
   uid node[:jones][:uid]
@@ -21,29 +22,40 @@ directory node[:jones][:destination] do
   mode "0755"
 end
 
-tarball = "#{Chef::Config[:file_cache_path]}/jones-#{node[:jones][:version]}.tar.gz"
+config_path = "#{node[:jones][:config_dir]}/jonesconfig.py"
 
-remote_file tarball do
-  action :create_if_missing
+template config_path do
+  source "config.py.erb"
   owner "root"
-  source node[:jones][:mirror]
+  group "root"
   mode "0644"
+  notifies :restart, "service[jones]"
+  variables(:config => node[:jones][:config])
 end
 
-bash "untar jones" do
-  user "root"
-  cwd "#{Chef::Config[:file_cache_path]}"
-  code %(tar zxf #{tarball})
-  creates "#{Chef::Config[:file_cache_path]}/jones-#{node[:jones][:version]}"
-end
-
-install_path = "#{node[:jones][:destination]}/jones-#{node[:jones][:version]}"
-
-bash "copy jones" do
+deploy node[:jones][:destination] do
+  repo node[:jones][:repo]
+  revision node[:jones][:tag]
   user node[:jones][:user]
-  cwd "#{Chef::Config[:file_cache_path]}"
-  code %(cp -r #{Chef::Config[:file_cache_path]}/jones-#{node[:jones][:version]} install_path})
-  creates install_path
+  environment "JONES_SETTINGS" => config_path
+  shallow_clone true
+  action :deploy # or :rollback
+  notifies :restart, "service[jones]"
+end
+
+template "gunicorn.upstart.conf" do
+  path "/etc/init/gunicorn.conf"
+  source "gunicorn.upstart.conf.erb"
+  owner "root"
+  group "root"
+  mode "0644"
+  notifies :stop, "service[exhibitor]" # :restart doesn't reload upstart conf
+  notifies :start, "service[exhibitor]"
+  variables(
+      :user => node[:jones][:user],
+      :bind_address => node[:jones][:gunicorn][:port],
+      :config_path => "#{node[:jones][:gunicorn][:config_dir]}/jones.py"
+  )
 end
 
 python_virtualenv node[:jones][:virtualenv] do
@@ -51,18 +63,9 @@ python_virtualenv node[:jones][:virtualenv] do
   action :create
 end
 
-python_pip "jones[web]" do
-  virtualenv node[:jones][:virtualenv]
-  action :install
+service "gunicorn" do
+  provider Chef::Provider::Service::Upstart
+  supports :start => true, :status => true, :restart => true
+  action :start
 end
 
-python_pip "gunicorn" do
-  virtualenv node[:jones][:virtualenv]
-  action :install
-end
-
-
-# TODO: there's got to be a better way of deciding if we should use zk_connect attribute or exhibitor
-if not node[:jones][:zk_connect].is_a? String
- zk_connect_str(discover_zookeepers(), node[:jones][:zk_chroot))
-end
