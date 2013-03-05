@@ -3,5 +3,4 @@ site :opscode
 metadata
 
 cookbook "zookeeper", github: "SimpleFinance/chef-zookeeper"
-# cookbook "application"
-# cookbook "application_python"
+cookbook "nginx_conf", github: "firebelly/chef-nginx_conf"

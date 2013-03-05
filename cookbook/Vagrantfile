@@ -38,6 +38,7 @@ Vagrant::Config.run do |config|
 
     chef.run_list = [
       "recipe[apt]",
+      #"recipe[build-essential]",
 #      "recipe[zookeeper]",
       "recipe[jones]"
     ]

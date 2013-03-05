@@ -8,8 +8,9 @@
 #
 
 include_recipe "gunicorn"
-
-package "git-core"
+include_recipe "nginx"
+chef_gem "zookeeper"
+package "libevent-dev"
 
 user node[:jones][:user] do
   uid node[:jones][:uid]
@@ -34,16 +35,9 @@ else
   raise "please either specify exhibitor hostname or zk connection string."
 end
 
-template config_path do
-  source "config.py.erb"
-  owner "root"
-  group "root"
-  mode "0644"
-  # notifies :restart, "service[jones]"
-  variables(
-    :config => node[:jones][:config],
-    :zk_connect_str => zk_connect_str
-  )
+zookeeper_node '/' do
+  action :create_if_missing
+  connect_str zk_connect_str
 end
 
 venv = "#{node[:jones][:destination]}/shared/env"
@@ -55,17 +49,16 @@ end
 
 application "jones" do
   path node[:jones][:destination]
-  # packages ["libpq-dev", "git-core", "mercurial"]
+  packages ["git-core"]
 
   repository node[:jones][:repo]
   revision node[:jones][:tag]
   owner node[:jones][:user]
   group node[:jones][:group]
-  # action :deploy # or :rollback
-  # notifies :restart, "service[jones]"
 
   gunicorn do
-    port 8080
+    packages ["gevent", "jones[web]"]
+    port 8000
     workers node[:cpu][:total] + 1
     backlog 2048
     worker_class "egg:gunicorn#gevent"
@@ -74,8 +67,22 @@ application "jones" do
     virtualenv venv
   end
 
-  nginx_load_balancer do
-    application_port 8080
-  end
+end
 
+template config_path do
+  source "config.py.erb"
+  owner "root"
+  group "root"
+  mode "0644"
+  # TODO
+  # notifies :restart, "supervisor_service[jones]"
+  variables(
+    :config => node[:jones][:config],
+    :zk_connect_str => zk_connect_str
+  )
+end
+
+nginx_conf_file "jones" do
+  socket "128.0.0.1:8000"
+  server_name "_"
 end
