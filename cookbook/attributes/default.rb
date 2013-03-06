@@ -23,4 +23,5 @@ default[:jones][:config][:zk_digest_password] = "changeme"
 default[:python][:distribute_install_py_version] = "2.7"
 default[:python][:install_method] = "package"
 
+override['nginx']['default_site_enabled'] = false
 override['nginx_conf']['pre_socket'] = 'http://'
