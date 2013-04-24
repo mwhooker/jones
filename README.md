@@ -23,6 +23,9 @@ Zookeeper is the ideal place for configuration. Besides it's availability guaran
 when data changes. Now we can change config at runtime, making possible a whole category of use-cases like switches, a/b
 tests, and knob and lever you can imagine.
 
+For more information, see my [talk](http://pyvideo.org/video/1567/configuration-management-with-zookeeper)
+and [presentation](https://speakerdeck.com/mwhooker/jones) at Pycon Canada.
+
 Using the client
 ----------------
 
@@ -80,25 +83,25 @@ Example data tree dump. This shows data for an example service:
     /conf
       foo = u'bar'
       /parent
-        a = 1 
+        a = 1
         b = [1, 2, 3]
         c = {u'x': 0}
         /child1
-          a = 2 
+          a = 2
     /nodemaps
       127.0.0.1 -> /services/testservice/views/parent
       127.0.0.2 -> /services/testservice/views/parent/child1
     /views
       foo = u'bar'
       /parent
-        a = 1 
+        a = 1
         b = [1, 2, 3]
         c = {u'x': 0}
         foo = u'bar'
         /child1
-          a = 2           
+          a = 2
           b = [1, 2, 3]
-          c = {u'x': 0}          
+          c = {u'x': 0}
           foo = u'bar'
 ```
 
