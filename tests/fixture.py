@@ -1,6 +1,4 @@
 """
-Copyright 2012 DISQUS
-
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -14,6 +12,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 from __future__ import unicode_literals
+from jones.jones import Env
 
 
 # TODO: rewrite tests so we test everything
@@ -47,16 +46,25 @@ for k in ('root', 'parent'):
 
 
 ASSOCIATIONS = {
-    '127.0.0.3' : '',
-    '127.0.0.1' : 'parent',
-    '127.0.0.2' : 'parent/child1'
+    '127.0.0.3': Env(''),
+    '127.0.0.1': Env('parent'),
+    '127.0.0.2': Env('parent/child1')
 }
 
+nodes = [Env(i) for i in [
+    None, 'parent', 'parent/child1', 'parent/child2',
+    'parent/child2/subchild1']]
+
+values = [CONFIG['root'],
+          CONFIG['parent'],
+          CONFIG['child1'],
+          CONFIG['child2'],
+          CONFIG['subchild1']]
+
+
 def init_tree(jones):
-    jones.create_config(None, CONFIG['root'])
-    jones.create_config('parent', CONFIG['parent'])
-    jones.create_config('parent/child1', CONFIG['child1'])
-    jones.create_config('parent/child2', CONFIG['child2'])
-    jones.create_config('parent/child2/subchild1', CONFIG['subchild1'])
+
+    for node, value in zip(nodes, values):
+        jones.create_config(node, value)
     for host in ASSOCIATIONS:
         jones.assoc_host(host, ASSOCIATIONS[host])

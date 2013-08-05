@@ -1,6 +1,4 @@
 """
-Copyright 2012 DISQUS
-
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -25,7 +23,7 @@ from kazoo.exceptions import NoNodeException
 from itertools import repeat, izip, imap
 import json
 
-from jones import Jones
+from jones import Jones, Env
 import zkutil
 import jonesconfig
 
@@ -76,7 +74,7 @@ def inject_services():
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('index.j2')
 
 
 def service_create(env, jones):
@@ -87,7 +85,8 @@ def service_create(env, jones):
         r.status_code = 201
         return r
     else:
-        return redirect(url_for('service', service=jones.service, env=env))
+        return redirect(url_for(
+            'service', service=jones.service, env=env))
 
 
 def service_update(env, jones):
@@ -96,11 +95,11 @@ def service_update(env, jones):
         json.loads(request.form['data']),
         int(request.form['version'])
     )
-    return env or ''
+    return env
 
 
 def service_delete(env, jones):
-    if not env:
+    if env.is_root:
         # deleting whole service
         jones.delete_all()
         #return redirect(url_for('index'))
@@ -113,8 +112,8 @@ def service_get(env, jones):
     if not jones.exists():
         return redirect(url_for('index'))
 
-    children = jones.get_child_envs()
-    is_leaf = lambda child: not any(
+    children = jones.get_child_envs(Env.Root)
+    is_leaf = lambda child: len(child) and not any(
         [c.find(child + '/') >= 0 for c in children])
 
     try:
@@ -123,13 +122,11 @@ def service_get(env, jones):
         return redirect(url_for('service', service=jones.service))
 
     childs = imap(dict, izip(
-        izip(repeat('env'),
-            imap(lambda env: env if len(env) else "/",
-                children)),
+        izip(repeat('env'), imap(Env, children)),
         izip(repeat('is_leaf'), imap(is_leaf, children))))
 
     vals = {
-        "env": env or '',
+        "env": env,
         "version": version,
         "children": list(childs),
         "config": config,
@@ -140,7 +137,7 @@ def service_get(env, jones):
     if request_wants('application/json'):
         return jsonify(vals)
     else:
-        return render_template('service.html', **vals)
+        return render_template('service.j2', **vals)
 
 
 SERVICE = {
@@ -153,13 +150,14 @@ SERVICE = {
 ALL_METHODS = ['GET', 'PUT', 'POST', 'DELETE']
 
 
-@app.route('/service/<string:service>', defaults={'env': None},
+@app.route('/service/<string:service>/', defaults={'env': None},
            methods=ALL_METHODS)
-@app.route('/service/<string:service>/<path:env>', methods=ALL_METHODS)
+@app.route('/service/<string:service>/<path:env>/', methods=ALL_METHODS)
 def service(service, env):
     jones = Jones(service, zk)
+    environment = Env(env)
 
-    return SERVICE[request.method.lower()](env, jones)
+    return SERVICE[request.method.lower()](environment, jones)
 
 
 # TODO: what if we have a path called association?
@@ -172,7 +170,7 @@ def association(service, assoc):
         if request_wants('application/json'):
             return jsonify(jones.get_config(assoc))
     if request.method == 'PUT':
-        jones.assoc_host(assoc, request.form['env'])
+        jones.assoc_host(assoc, Env(request.form['env']))
         return service, 201
     elif request.method == 'DELETE':
         jones.delete_association(assoc)
