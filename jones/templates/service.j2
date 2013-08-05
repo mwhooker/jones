@@ -57,7 +57,7 @@ var config = {{ config | tojson |safe }};
     <div class="row-fluid">
         <div class="col-lg-4 well">
             <h4>Environments</h4>
-            <table class="env-table table table-striped">
+            <table class="table table-striped table-condensed">
                 <tbody>
                 {% for child in children %}
                     {% set issame = (child["env"] == env )%}
@@ -80,11 +80,11 @@ var config = {{ config | tojson |safe }};
                             {% endif %}
                         </td>
                         {% if child["is_leaf"] %}
-                        <td>
+                        <td style="width:10%">
                             <a class="btn del-env btn-mini" href="{{ child_url }}">Delete</a>
                         </td>
                         {% endif %}
-                        <td>
+                        <td style="width:10%">
                             <a class="btn add-env btn-mini" data-env="{{ child_url }}">Add Child</a>
                         </td>
                     </tr>
