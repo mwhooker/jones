@@ -37,28 +37,34 @@ var config = {{ config | tojson |safe }};
     </div>
 
     <div class="row-fluid">
-        <div class="span4 well">
+        <div class="col-lg-4 well">
             <h4>Environments</h4>
-            <table class="env-table table table-condensed table-striped">
+            <table class="env-table table table-striped">
                 <tbody>
                 {% for child in children %}
                     {% set ischild = (child["env"][1:] == (env or '')) %}
                     {% set child_url = "/service/%s%s"|format(service, child["env"]) %}
 
                     <tr>
+                        {% if not child["is_leaf"] %}
+                        <td colspan=2>
+                        {% else %}
                         <td>
+                        {% endif %}
                             {% if ischild%}
-                            <span><strong>{{ child["env"] }}</strong></span>
+                                <span><strong>{{ child["env"] }}</strong></span>
                             {% else %}
-                            {# TODO: link span shoud go all the way to buttons. for clicking.#}
-                            <a href="{{ child_url }}"><span>{{ child["env"] }}</span></a>
+                                <a style="display:block ; width:100%" href="{{ child_url }}">
+                                {{ child["env"] }}</a>
                             {% endif %}
-                            <span class="pull-right">
-                                {% if child["is_leaf"] %}
-                                <a class="btn del-env btn-mini" href="{{ child_url }}">Delete</a>
-                                {% endif %}
-                                <a class="btn add-env btn-mini" data-env="{{ child_url }}">Add Child</a>
-                            </span>
+                        </td>
+                        {% if child["is_leaf"] %}
+                        <td>
+                            <a class="btn del-env btn-mini" href="{{ child_url }}">Delete</a>
+                        </td>
+                        {% endif %}
+                        <td>
+                            <a class="btn add-env btn-mini" data-env="{{ child_url }}">Add Child</a>
                         </td>
                     </tr>
                 {% endfor %}
@@ -100,10 +106,14 @@ var config = {{ config | tojson |safe }};
             <pre class="prettyprint lang-javascript">{{ view | as_json(2) }}</pre>
         </div>
 
-        <div class="span8">
-            <div id="jsoneditor"></div>
-            <div id="jsonformatter"></div>
-            <button class="btn" id="update">Update</button>
+        <div class="col-lg-8">
+        <p>
+        <div id="jsoneditor"></div>
+        <div id="jsonformatter"></div>
+        </p>
+        <p>
+        <button class="btn" id="update">Update</button>
+        </p>
         </div>
     </div>
 </div>

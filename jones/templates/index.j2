@@ -6,10 +6,10 @@
         <h1>Service list</h1>
     </div>
     <div class="row">
-        <div class="span6">
+        <div class="col-lg-6">
         <ul>
-            {% for service in services %}
-            <li><a href="/service/{{ service }}">{{ service }}</a></li>
+            {% for svc in services %}
+            <li><a href="/service/{{ svc }}">{{ svc }}</a></li>
             {% endfor %}
         </ul>
     </div>

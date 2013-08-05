@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <link rel=stylesheet href="{{ url_for('.static', filename='css/bootstrap.css') }}">
-    <link rel=stylesheet href="{{ url_for('.static', filename='css/bootstrap-responsive.css') }}">
     <link rel=stylesheet href="{{ url_for('.static', filename='css/global.css') }}">
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
     {% block head %}{% endblock %}
@@ -16,42 +15,49 @@
   <body>
 
     <div class="navbar navbar-fixed-top">
-      <div class="navbar-inner">
-        <div class="container">
-          <a class="brand" href="#">Jones</a>
-          <ul class="nav">
-              {% for href, id, caption in navigation_bar %}
-              <li{% if id == active_page %} class="active"{% endif %}>
-              <a href="{{ href|e }}">{{ caption|e }}</a>
-              </li>
+      <a class="navbar-brand" href="#">Jones</a>
+      <ul class="nav navbar-nav">
+          {% for href, id, caption in navigation_bar %}
+          <li{% if id == active_page %} class="active"{% endif %}>
+          <a href="{{ href|e }}">{{ caption|e }}</a>
+          </li>
+          {% endfor %}
+          <li id="service-nav" class="dropdown">
+          <a href="#"
+              class="dropdown-toggle"
+              data-toggle="dropdown">
+              {% if service %}
+              {{ service }}
+              {% else %}
+              services
+              {% endif %}
+              <b class="caret"></b>
+          </a>
+          <ul class="dropdown-menu" role="menu" >
+              {% for svc in services %}
+              {% if svc == service %} 
+              <li><a><strong>{{ svc }}</strong></a></li>
+              {% else %}
+              <li><a href="/service/{{ svc }}">{{ svc }}</a></li>
+              {% endif %}
               {% endfor %}
-              <li id="service-nav" class="dropdown">
-              <a href="#"
-                  class="dropdown-toggle"
-                  data-toggle="dropdown">
-                  Services
-                  <b class="caret"></b>
-              </a>
-              <ul class="dropdown-menu">
-                  {% for service in services %}
-                  <li><a href="/service/{{ service }}">{{ service }}</a></li>
-                  {% endfor %}
-                  <li class="divider"></li>
-                  <form class="navbar-form pull-left" method="post">
-                      <input type="text" class="span2" placeholder="Add Service…">
-                  </form>
-              </ul>
+              <li class="divider"></li>
+              <li>
+              <form class="navbar-form pull-left" method="post">
+                  <input type="text" class="form-control" placeholder="Add Service…">
+                  <button type="submit" class="btn btn-default">Submit</button>
+              </form>
               </li>
           </ul>
-        </div>
-      </div>
+          </li>
+      </ul>
     </div>
 
     <div class="container">
 
         {% with messages = get_flashed_messages() %}
           {% if messages %}
-            <div class="row span8">
+            <div class="row col-8">
                 {% for message in messages %}
                 <div class="alert alert-info">
                     <button class="close" data-dismiss="alert">×</button>
