@@ -1,6 +1,4 @@
 """
-Copyright 2012 DISQUS
-
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -18,7 +16,7 @@ from __future__ import unicode_literals
 import threading
 
 from tests import fixture
-from jones.jones import Jones
+from jones.jones import Jones, Env
 from jones.client import JonesClient, EnvironmentNotFoundException
 from kazoo.testing import KazooTestCase
 
@@ -35,6 +33,7 @@ The amount of wall-clock delay is reflected in the below magic number.
 
 MAGIC_NUMBER = 0.5
 
+
 class TestJonesClient(KazooTestCase):
 
     def setUp(self):
@@ -46,8 +45,8 @@ class TestJonesClient(KazooTestCase):
 
         self.jones = Jones(self.service, self.client)
         fixture.init_tree(self.jones)
-        self.jones_client = JonesClient(self.client, self.service, self.default_cb,
-                                        self.hostname)
+        self.jones_client = JonesClient(self.client, self.service,
+                                        self.default_cb, self.hostname)
 
     def default_cb(self, config):
         self.config = config
@@ -74,7 +73,7 @@ class TestJonesClient(KazooTestCase):
         """test that changing the associations updates config properly."""
 
         self.ev.clear()
-        self.jones.assoc_host(self.hostname, 'parent')
+        self.jones.assoc_host(self.hostname, Env('parent'))
         self.ev.wait(MAGIC_NUMBER)
         self.assertEquals(self.config, fixture.PARENT)
 
@@ -99,7 +98,7 @@ class TestJonesClient(KazooTestCase):
         self.assertTrue(ev.isSet())
 
         ev.clear()
-        self.jones.assoc_host(hostname, 'parent')
+        self.jones.assoc_host(hostname, Env('parent'))
         ev.wait(MAGIC_NUMBER)
         self.assertEquals(client.config, fixture.PARENT)
         self.assertTrue(ev.isSet())
@@ -112,7 +111,7 @@ class TestJonesClient(KazooTestCase):
     def test_resets_watches(self):
         def test(fixt):
             self.ev.clear()
-            self.jones.set_config('parent', {'k': fixt}, -1)
+            self.jones.set_config(Env('parent'), {'k': fixt}, -1)
             self.ev.wait(MAGIC_NUMBER)
             self.assertEquals(self.config['k'], fixt)
 

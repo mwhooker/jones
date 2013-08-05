@@ -72,6 +72,33 @@ class ZNodeMap(object):
         self.zk.set(self.path, _serialize(data).encode('utf8'), version)
 
 
+class Env(object):
+    def __init__(self, name):
+        if not name:
+            self._empty = True
+            self.name = ''
+        else:
+            assert name[0] != '/'
+            self._empty = False
+            self.name = name
+
+    @property
+    def is_root(self):
+        return self._empty
+
+    @property
+    def components(self):
+        if self.is_root:
+            return ['']
+        else:
+            return str(self).split('/')
+
+    def __str__(self):
+        return self.name
+
+Root = Env(None)
+
+
 class Jones(object):
     """
 
@@ -139,8 +166,8 @@ class Jones(object):
             self._update_view(src)
             path = self._get_env_path(src)
             for child in self.zk.get_children(path):
-                if src:
-                    child = "%s/%s" % (src, child)
+                if not src.is_root:
+                    child = Env("%s/%s" % (src, str(child)))
                 propogate(child)
 
         propogate(env)
@@ -195,7 +222,7 @@ class Jones(object):
         dest = self._get_view_path(env)
         self.associations.set(hostname, dest)
 
-    def get_associations(self, env=None):
+    def get_associations(self, env):
         """
         Get all the associations for this env.
 
@@ -204,10 +231,10 @@ class Jones(object):
         returns a map of hostnames to environments.
         """
 
-        associations = self.associations.get_all()
-
-        if not env:
+        if env.is_root:
             return None
+
+        associations = self.associations.get_all()
         return [assoc for assoc in associations
                 if associations[assoc] == self._get_view_path(env)]
 
@@ -218,13 +245,14 @@ class Jones(object):
         """Does this service exist in zookeeper"""
 
         return self.zk.exists(
-            self._get_env_path(None)
+            self._get_env_path(Root)
         )
 
     def delete_all(self):
         self.zk.delete(self.root, recursive=True)
 
-    def get_child_envs(self, env=None):
+    def get_child_envs(self, env):
+        # XXX Env?
         prefix = self._get_env_path(env)
         envs = zkutil.walk(self.zk, prefix)
         return map(lambda e: e[len(prefix):], envs)
@@ -234,7 +262,7 @@ class Jones(object):
         Flatten values from root down in to new view.
         """
 
-        nodes = env.split('/')
+        nodes = env.components
 
         # Path through the znode graph from root ('') to env
         path = [nodes[:n] for n in xrange(len(nodes) + 1)]
@@ -242,7 +270,7 @@ class Jones(object):
         # Expand path and map it to the root
         path = map(
             self._get_env_path,
-            ['/'.join(p) for p in path]
+            [Env('/'.join(p)) for p in path]
         )
 
         data = {}
@@ -253,8 +281,6 @@ class Jones(object):
         return data
 
     def _update_view(self, env):
-        if not env:
-            env = ''
 
         dest = self._get_view_path(env)
         if not self.zk.exists(dest):
@@ -263,10 +289,9 @@ class Jones(object):
         self._set(dest, self._flatten_to_root(env))
 
     def _get_path_by_env(self, prefix, env):
-        if not env:
+        if env.is_root:
             return prefix
-        assert env[0] != '/'
-        return '/'.join((prefix, env))
+        return '/'.join((prefix, str(env)))
 
     def _get_nodemap_path(self, hostname):
         return "%s/%s" % (self.nodemap_path, hostname)
@@ -279,4 +304,6 @@ class Jones(object):
         return self.zk.set(path, json.dumps(data), *args, **kwargs)
 
     def _create(self, path, data, *args, **kwargs):
+        print path
+        print data
         return self.zk.create(path, json.dumps(data), *args, **kwargs)

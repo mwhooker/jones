@@ -112,7 +112,7 @@ def service_get(env, jones):
         return redirect(url_for('index'))
 
     children = jones.get_child_envs()
-    is_leaf = lambda child: not any(
+    is_leaf = lambda child: len(child) and not any(
         [c.find(child + '/') >= 0 for c in children])
 
     try:
@@ -122,8 +122,8 @@ def service_get(env, jones):
 
     childs = imap(dict, izip(
         izip(repeat('env'),
-            imap(lambda env: env if len(env) else "/",
-                children)),
+             imap(lambda env: env if len(env) else "/",
+                  children)),
         izip(repeat('is_leaf'), imap(is_leaf, children))))
 
     vals = {
@@ -156,8 +156,9 @@ ALL_METHODS = ['GET', 'PUT', 'POST', 'DELETE']
 @app.route('/service/<string:service>/<path:env>', methods=ALL_METHODS)
 def service(service, env):
     jones = Jones(service, zk)
+    environment = jones.Env(env)
 
-    return SERVICE[request.method.lower()](env, jones)
+    return SERVICE[request.method.lower()](environment, jones)
 
 
 # TODO: what if we have a path called association?
@@ -170,7 +171,7 @@ def association(service, assoc):
         if request_wants('application/json'):
             return jsonify(jones.get_config(assoc))
     if request.method == 'PUT':
-        jones.assoc_host(assoc, request.form['env'])
+        jones.assoc_host(assoc, jones.Env(request.form['env']))
         return service, 201
     elif request.method == 'DELETE':
         jones.delete_association(assoc)

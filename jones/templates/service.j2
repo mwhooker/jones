@@ -90,7 +90,7 @@ var config = {{ config | tojson |safe }};
             </table>
 
             <h4>Associations</h4>
-            {% if not env %}
+            {% if env.is_root %}
                 <div class="alert alert-info">
                     All associations default to root.
                 </div>

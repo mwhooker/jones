@@ -16,6 +16,10 @@ limitations under the License.
 $(function() {
     window.editor = new JSONEditor($('#jsoneditor')[0]);
     window.editor.set(config);
+
+    function join_env(env) {
+    }
+
     $('#update').click(function() {
         $.ajax({
             url: window.location.href,
@@ -39,7 +43,7 @@ $(function() {
 
       $('input', form).focus().bind(
         "propertychange keyup input paste", function(event){
-        $('#addChildModal .modal-header h4').text(env + '/' + $(this).val());
+        $('#addChildModal .modal-header h4').text(join_env($(this).val()));
       });
 
       $(form).submit(function() {

@@ -1,6 +1,4 @@
 """
-Copyright 2012 DISQUS
-
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -21,7 +19,10 @@ from kazoo.exceptions import BadVersionException, NoNodeException
 from kazoo.testing.harness import KazooTestCase
 from tests import fixture
 
-from jones.jones import Jones
+from jones.jones import Jones, Env
+
+
+Root = Env(None)
 
 
 class TestJones(KazooTestCase):
@@ -34,7 +35,8 @@ class TestJones(KazooTestCase):
     def test_creates_root(self):
 
         fixt = {'xy': 'z'}
-        self.jones.create_config(None, fixt)
+        self.jones.create_config(Root, fixt)
+        print json.loads(self.client.get(self.jones.view_path)[0])
         self.assertEquals(
             json.loads(self.client.get(self.jones.view_path)[0]),
             fixt
@@ -49,8 +51,8 @@ class TestJones(KazooTestCase):
         )
 
     def test_overwrites(self):
-        self.jones.create_config(None, {"foo": "bar"})
-        self.jones.set_config(None, {"foo": "baz"}, -1)
+        self.jones.create_config(Root, {"foo": "bar"})
+        self.jones.set_config(Root, {"foo": "baz"}, -1)
 
         self.assertEquals(
             self.jones._get(self.jones.conf_path)[1]['foo'],
@@ -61,20 +63,20 @@ class TestJones(KazooTestCase):
         fixture.init_tree(self.jones)
         parent = dict(fixture.CONFIG['parent'])
         parent['new'] = 'key'
-        self.jones.set_config('parent', parent, 0)
+        self.jones.set_config(Env('parent'), parent, 0)
         #self.client.print_tree('/services')
 
         for i in ('127.0.0.1', '127.0.0.2'):
             config = self.jones.get_config(i)
             self.assertEquals(config.get('b'), [1, 2, 3],
-                             "Host %s didn't inherit properly." % i)
+                              "Host %s didn't inherit properly." % i)
             self.assertEquals(config.get('new'), 'key',
                               "Host %s not updated." % i)
 
     def test_conflicts(self):
 
-        self.jones.create_config(None, {"foo": "bar"})
-        self.jones.set_config(None, {"foo": "baz"}, 0)
+        self.jones.create_config(Root, {"foo": "bar"})
+        self.jones.set_config(Root, {"foo": "baz"}, 0)
 
         self.assertEquals(
             self.jones._get(self.jones.conf_path)[1]['foo'],
@@ -84,12 +86,12 @@ class TestJones(KazooTestCase):
         self.assertRaises(
             BadVersionException,
             self.jones.set_config,
-            None, {"foo": "bag"}, 4,
+            Root, {"foo": "bag"}, 4,
         )
 
     def test_delete_config(self):
         fixture.init_tree(self.jones)
-        env = 'parent/child1'
+        env = Env('parent/child1')
         self.jones.delete_config(env, -1)
 
         self.assertRaises(
@@ -116,7 +118,7 @@ class TestJones(KazooTestCase):
         self.assertRaises(
             ValueError,
             self.jones.create_config,
-            None, 'hello'
+            Root, 'hello'
         )
 
     def test_get_associations(self):
@@ -141,7 +143,7 @@ class TestJones(KazooTestCase):
     def test_create_service(self):
         """Test that creating a service creates stub conf/view/nodemaps."""
 
-        env = None
+        env = Root
         self.jones.create_config(env, {})
         self.assertEquals(self.jones.get_associations(env), None)
         self.assertEquals(self.jones.get_view_by_env(env), {})
@@ -150,13 +152,13 @@ class TestJones(KazooTestCase):
 
     def test_exists_reflectes_creation(self):
         self.assertFalse(self.jones.exists())
-        self.jones.create_config(None, {})
+        self.jones.create_config(Root, {})
         self.assertTrue(self.jones.exists())
 
     def test_delete_service(self):
         """Test that deleting a service removes all sub-nodes."""
 
-        env = None
+        env = Root
         self.jones.create_config(env, {})
 
         self.jones.delete_all()
