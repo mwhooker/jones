@@ -39,7 +39,11 @@ $(function() {
       $('#addChildModal .modal-header h4').text(env);
       $('#addChildModal').modal();
 
-      $('input', form).focus();
+      $('input', form).focus().bind(
+        "propertychange keyup input paste", function(event){
+        $('#addChildModal .modal-header h4').text(env + '/' + $(this).val());
+      });
+
       $(form).submit(function() {
         $(this).attr('action', env + $('input', this).val());
       });
