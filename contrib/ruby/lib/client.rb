@@ -1,6 +1,7 @@
+require 'forwardable'
 require 'json'
-require 'zk'
 require 'socket'
+require 'zk'
 
 
 class JonesClient
