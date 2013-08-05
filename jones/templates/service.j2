@@ -60,20 +60,23 @@ var config = {{ config | tojson |safe }};
             <table class="env-table table table-striped">
                 <tbody>
                 {% for child in children %}
-                    {% set ischild = (child["env"][1:] == (env or '')) %}
-                    {% set child_url = "/service/%s%s"|format(service, child["env"]) %}
-
+                    {% set issame = (child["env"] == env )%}
+                    {#% set child_url = "/service/%s/%s/"|format(service, child["env"]) %#}
+                    {% set child_url = "/service/%s/"|format(service) %}
+                    {% if not child["env"].is_root %}
+                        {% set child_url = "%s%s/"|format(child_url, child["env"]) %}
+                    {% endif %}
                     <tr>
                         {% if not child["is_leaf"] %}
                         <td colspan=2>
                         {% else %}
                         <td>
                         {% endif %}
-                            {% if ischild%}
-                                <span><strong>{{ child["env"] }}</strong></span>
+                            {% if issame%}
+                                <span><strong>/{{ child["env"] }}</strong></span>
                             {% else %}
                                 <a style="display:block ; width:100%" href="{{ child_url }}">
-                                {{ child["env"] }}</a>
+                                /{{ child["env"] }}</a>
                             {% endif %}
                         </td>
                         {% if child["is_leaf"] %}
@@ -99,7 +102,7 @@ var config = {{ config | tojson |safe }};
                     <ul class="unstyled">
                         {% for hostname in associations %}
                         <li style="padding: 2px;">
-                        {# TODO: only eval this loop if assocs[hostname] == this enviornment. #}
+                        {# TODO: only eval this loop if assocs[hostname] == this environment. #}
                         <span>{{ hostname }}</span>
                         <span class="pull-right">
                             <button class="btn btn-mini del-assoc" data-hostname="{{ hostname }}"

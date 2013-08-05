@@ -72,15 +72,17 @@ class ZNodeMap(object):
         self.zk.set(self.path, _serialize(data).encode('utf8'), version)
 
 
-class Env(object):
-    def __init__(self, name):
+class Env(unicode):
+    def __new__(cls, name):
         if not name:
-            self._empty = True
-            self.name = ''
+            empty = True
+            name = ''
         else:
             assert name[0] != '/'
-            self._empty = False
-            self.name = name
+            empty = False
+        s = unicode.__new__(cls, name)
+        s._empty = empty
+        return s
 
     @property
     def is_root(self):
@@ -91,10 +93,7 @@ class Env(object):
         if self.is_root:
             return ['']
         else:
-            return str(self).split('/')
-
-    def __str__(self):
-        return self.name
+            return self.split('/')
 
 Env.Root = Env(None)
 
@@ -167,7 +166,7 @@ class Jones(object):
             path = self._get_env_path(src)
             for child in self.zk.get_children(path):
                 if not src.is_root:
-                    child = Env("%s/%s" % (src, str(child)))
+                    child = Env("%s/%s" % (src, child))
                 propogate(child)
 
         propogate(env)
@@ -252,10 +251,9 @@ class Jones(object):
         self.zk.delete(self.root, recursive=True)
 
     def get_child_envs(self, env):
-        # XXX Env?
         prefix = self._get_env_path(env)
         envs = zkutil.walk(self.zk, prefix)
-        return map(lambda e: e[len(prefix):], envs)
+        return map(lambda e: e[len(prefix)+1:], envs)
 
     def _flatten_to_root(self, env):
         """
@@ -291,7 +289,7 @@ class Jones(object):
     def _get_path_by_env(self, prefix, env):
         if env.is_root:
             return prefix
-        return '/'.join((prefix, str(env)))
+        return '/'.join((prefix, env))
 
     def _get_nodemap_path(self, hostname):
         return "%s/%s" % (self.nodemap_path, hostname)

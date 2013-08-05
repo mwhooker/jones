@@ -86,7 +86,7 @@ def service_create(env, jones):
         return r
     else:
         return redirect(url_for(
-            'service', service=jones.service, env=str(env)))
+            'service', service=jones.service, env=env))
 
 
 def service_update(env, jones):
@@ -95,7 +95,7 @@ def service_update(env, jones):
         json.loads(request.form['data']),
         int(request.form['version'])
     )
-    return str(env)
+    return env
 
 
 def service_delete(env, jones):
@@ -105,7 +105,7 @@ def service_delete(env, jones):
         #return redirect(url_for('index'))
     else:
         jones.delete_config(env, -1)
-    return str(env), 200
+    return env, 200
 
 
 def service_get(env, jones):
@@ -122,13 +122,11 @@ def service_get(env, jones):
         return redirect(url_for('service', service=jones.service))
 
     childs = imap(dict, izip(
-        izip(repeat('env'),
-             imap(lambda env: env if len(env) else "/",
-                  children)),
+        izip(repeat('env'), imap(Env, children)),
         izip(repeat('is_leaf'), imap(is_leaf, children))))
 
     vals = {
-        "env": env or '',
+        "env": env,
         "version": version,
         "children": list(childs),
         "config": config,
@@ -152,9 +150,9 @@ SERVICE = {
 ALL_METHODS = ['GET', 'PUT', 'POST', 'DELETE']
 
 
-@app.route('/service/<string:service>', defaults={'env': None},
+@app.route('/service/<string:service>/', defaults={'env': None},
            methods=ALL_METHODS)
-@app.route('/service/<string:service>/<path:env>', methods=ALL_METHODS)
+@app.route('/service/<string:service>/<path:env>/', methods=ALL_METHODS)
 def service(service, env):
     jones = Jones(service, zk)
     environment = Env(env)

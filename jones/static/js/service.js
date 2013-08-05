@@ -17,9 +17,6 @@ $(function() {
     window.editor = new JSONEditor($('#jsoneditor')[0]);
     window.editor.set(config);
 
-    function join_env(env) {
-    }
-
     $('#update').click(function() {
         $.ajax({
             url: window.location.href,
@@ -37,17 +34,20 @@ $(function() {
     $('.add-env').click(function() {
       var form = $('#addChildModal form');
       var env = $(this).data('env');
+      function join_env(newenv) {
+        return env + newenv;
+      }
 
       $('#addChildModal .modal-header h4').text(env);
       $('#addChildModal').modal();
 
       $('input', form).focus().bind(
         "propertychange keyup input paste", function(event){
-        $('#addChildModal .modal-header h4').text(join_env($(this).val()));
+          $('#addChildModal .modal-header h4').text(join_env($(this).val()));
       });
 
-      $(form).submit(function() {
-        $(this).attr('action', env + $('input', this).val());
+      form.submit(function() {
+        $(this).attr('action', join_env($('input', this).val()) + '/');
       });
 
       return false;
