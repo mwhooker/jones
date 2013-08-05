@@ -12,9 +12,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
+from functools import partial
 import collections
 import json
-from functools import partial
 import zkutil
 
 
@@ -158,18 +158,10 @@ class Jones(object):
             conf,
             version
         )
-
-        def propogate(src):
-            """Update env's children with new config."""
-
-            self._update_view(src)
-            path = self._get_env_path(src)
-            for child in self.zk.get_children(path):
-                if not src.is_root:
-                    child = Env("%s/%s" % (src, child))
-                propogate(child)
-
-        propogate(env)
+        path = self._get_env_path(env)
+        """Update env's children with new config."""
+        for child in zkutil.walk(self.zk, path):
+            self._update_view(Env(child[len(self.conf_path)+1:]))
 
     def delete_config(self, env, version):
         self.zk.delete(
