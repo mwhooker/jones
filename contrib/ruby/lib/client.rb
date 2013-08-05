@@ -3,17 +3,21 @@ require 'zk'
 require 'socket'
 
 
-
 class JonesClient
-  def initialize(options = {})
-    yield self if block_given?
+  extend Forwardable
+  attr_accessor :data
+  def_delegators :@data, :[]
 
+  def initialize(options = {})
+    @data = nil
     @callbacks = []
-    @conf_subscription = nil
+    @conf_sub = nil
     @conf_path = nil
+    logger = Logger.new(STDOUT)
 
     parse_options(options)
     setup_zk
+    read_nodemap
   end
 
   def register_callback(&block)
@@ -38,27 +42,39 @@ class JonesClient
       mapping = Hash[data.split("\n").map {|s| s.split(' -> ') }]
       conf_path = mapping.fetch(@host, conf_root)
     end
-    if conf_path != @conf_path
-      @conf_path = conf_path
-      if not @conf_subscription.nil?
-        @conf_subscription.unsubscribe
-      end
-      @conf_subscription = @zk.register(@conf_path) { |event| read_conf(event) }
-    end
-    
-    read_conf(nil)
+
+    setup_conf(conf_path)
   end
 
-  def read_conf(event)
+  def setup_conf(conf_path)
+    if conf_path != @conf_path
+      # path changed so we need to register a new handler
+      @conf_path = conf_path
+      @conf_sub.unsubscribe unless @conf_sub.nil?
+      @conf_sub = @zk.register(@conf_path) { |event| conf_changed(event) }
+      read_conf
+    end
+  end
+
+  def conf_changed(event)
+    if event.node_changed?
+      read_conf
+    else
+      logger.error("Unknown ZK node event: #{event.inspect}")
+    end
+  end
+
+  def read_conf()
     @data = JSON.load(@zk.get(@conf_path, :watch => true).first)
+    @callbacks.each { |cb| cb.call(@data) }
   end
 
   def setup_zk
     @zk = ZK.new(@zkservers) if @zkservers
     @zk.on_expired_session { setup_zk }
     @zk.register(nodemap_path, :only => :changed) { |event| nodemap_changed(event) }
+    # reset watch in case of disconnect
     @zk.on_connected { read_nodemap }
-    read_nodemap
   end
 
   def parse_options(options)
@@ -72,7 +88,6 @@ class JonesClient
     @zkroot = "/services/#{options[:service]}"
   end
 
-
   def nodemap_path
     "#{@zkroot}/nodemaps"
   end
@@ -80,12 +95,14 @@ class JonesClient
   def conf_root
     "#{@zkroot}/conf"
   end
-
-
 end
 
 
 #zk = ZK.new('localhost:2181')
 
 jc = JonesClient.new(:zkservers => 'localhost:2181', :service => 'test')
-puts "hi"
+jc.register_callback { |data| puts data['field'] }
+puts jc['field']
+
+sleep(20)
+puts jc['field']
