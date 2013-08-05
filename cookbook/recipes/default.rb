@@ -35,19 +35,19 @@ end
 
 config_path = "#{node[:jones][:destination]}/shared/jonesconfig.py"
 
-if node[:exhibitor][:hostname].is_a? String
-  zk_connect_str = zk_connect_str(
-    discover_zookeepers(node[:exhibitor][:hostname]),
-    node[:jones][:zk_chroot])
-elsif node[:jones][:zk_connect].is_a? String
-  zk_connect_str = node[:jones][:zk_connect]
-else
-  raise "please either specify exhibitor hostname or zk connection string."
-end
-
-zookeeper_node '/' do
-  action :create_if_missing
-  connect_str zk_connect_str
+ruby_block 'set-exhibitor-hostname' do
+  block do
+    if not node[:kafka][:config][:zk_connect].is_a? String
+      host = exhibitor_url()
+      node.override[:jones][:zk_connect] = zk_connect_str(
+        discover_zookeepers(host), node[:jones][:zk_chroot])
+    end
+    zookeeper_node '/' do
+      action :create_if_missing
+      connect_str node[:jones][:zk_connect]
+    end
+  end
+  action :nothing
 end
 
 venv = "#{node[:jones][:destination]}/shared/env"
@@ -89,8 +89,9 @@ template config_path do
   # notifies :restart, "supervisor_service[jones]"
   variables(
     :config => node[:jones][:config],
-    :zk_connect_str => zk_connect_str
+    :zk_connect_str => node[:jones][:zk_connect]
   )
+  notifies :create, 'ruby_block[set-exhibitor-hostname]', :immediately
 end
 
 nginx_conf_file "jones" do
