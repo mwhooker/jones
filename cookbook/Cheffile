@@ -1,0 +1,11 @@
+#!/usr/bin/env ruby
+#^syntax detection
+
+site 'http://community.opscode.com/api/v1'
+
+cookbook 'python'
+cookbook 'nginx_conf'
+cookbook 'zookeeper'
+cookbook 'application_python'
+
+cookbook 'jones', :path => './'
