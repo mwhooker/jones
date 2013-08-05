@@ -14,7 +14,7 @@ class JonesClient
     @callbacks = []
     @conf_sub = nil
     @conf_path = nil
-    logger = Logger.new(STDOUT)
+    @logger = Logger.new(STDOUT)
 
     parse_options(options)
     setup_zk
@@ -31,7 +31,7 @@ class JonesClient
     if event.node_changed?
       read_nodemap
     else
-      logger.error("Unknown ZK node event: #{event.inspect}")
+      @logger.error("Unknown ZK node event: #{event.inspect}")
     end
   end
 
@@ -40,7 +40,7 @@ class JonesClient
     if data.nil?
       conf_path = conf_root
     else
-      mapping = Hash[data.split("\n").map {|s| s.split(' -> ') }]
+      mapping = JSON.load(data)
       conf_path = mapping.fetch(@host, conf_root)
     end
 
