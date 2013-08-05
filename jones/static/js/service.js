@@ -74,7 +74,7 @@ $(function() {
     $("#associations > .btn").click(function() {
         $(this).hide();
 
-        $('#add-assoc').show();
+        $('#add-assoc').removeClass('hidden');
         $('#add-assoc .btn').click(function() {
             var href = '/service/' + service;
             href += '/association/' + $('#add-assoc input').val();

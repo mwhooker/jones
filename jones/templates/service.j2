@@ -99,27 +99,33 @@ var config = {{ config | tojson |safe }};
                 </div>
             {% else %}
                 <div class="well" id="associations">
-                    <ul class="unstyled">
-                        {% for hostname in associations %}
-                        <li style="padding: 2px;">
-                        {# TODO: only eval this loop if assocs[hostname] == this environment. #}
-                        <span>{{ hostname }}</span>
-                        <span class="pull-right">
-                            <button class="btn btn-mini del-assoc" data-hostname="{{ hostname }}"
-                                data-loading-text="Deleting…">Delete</button>
-                        </span>
-                        </li>
-                        {% else %}
+                <ul class="list-group">
+                    {% for hostname in associations %}
+                    <li class="list-group-item">
+                      {# TODO: only eval this loop if assocs[hostname] == this environment. #}
+                      <span>{{ hostname }}</span>
+                      <span class="pull-right">
+                        <button class="btn btn-mini del-assoc" data-hostname="{{ hostname }}"
+                          data-loading-text="Deleting…">Delete</button>
+                      </span>
+                    </li>
+                    {% else %}
                         <li>None</li>
-                        {% endfor %}
-                    </ul>
-                    <div class="hide" id="add-assoc">
-                        <input type="text" class="input-medium" id="hostname">
-                        <button type="submit" class="btn btn-mini pull-right"
-                            data-loading-text="Associating…">
-                            Associate</button>
-                    </div>
-                    <button autocomplete="off" class="btn btn-mini">Add</button>
+                    {% endfor %}
+                </ul>
+                <div class="hidden row-fluid" id="add-assoc">
+                    <p>
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="hostname">
+                            <span class="input-group-btn">
+                                <button type="submit" class="btn btn-default pull-right"
+                                    data-loading-text="Associating…">
+                                    Associate</button>
+                            </span>
+                    </div><!-- /input-group -->
+                    </p>
+                </div>
+                <button autocomplete="off" class="btn btn-mini">Add</button>
                 </div>
             {% endif %}
 

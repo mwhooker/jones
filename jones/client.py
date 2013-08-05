@@ -81,7 +81,7 @@ class JonesClient(Mapping):
     def _deserialize_nodemap(d):
         if not len(d):
             return {}
-        return dict(l.split(' -> ') for l in d.split('\n'))
+        return json.loads(d)
 
     def __getitem__(self, key):
         return self.config[key]

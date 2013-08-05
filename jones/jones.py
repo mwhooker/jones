@@ -21,7 +21,7 @@ import zkutil
 class ZNodeMap(object):
     """Associate znodes with names."""
 
-    SEPARATOR = ' -> '
+    OLD_SEPARATOR = ' -> '
 
     def __init__(self, zk, path):
         """
@@ -55,21 +55,28 @@ class ZNodeMap(object):
     def _get(self):
         """get and parse data stored in self.path."""
 
-        def _deserialize(d):
-            if not len(d):
-                return {}
-            return dict(l.split(self.SEPARATOR) for l in d.split('\n'))
-
         data, stat = self.zk.get(self.path)
-        return _deserialize(data.decode('utf8')), stat.version
+        if not len(data):
+            return {}, stat.version
+        if self.OLD_SEPARATOR in data:
+            return self._get_old()
+        return json.loads(data), stat.version
 
     def _set(self, data, version):
         """serialize and set data to self.path."""
 
-        def _serialize(d):
-            return '\n'.join(self.SEPARATOR.join((k, d[k])) for k in d)
+        self.zk.set(self.path, json.dumps(data), version)
 
-        self.zk.set(self.path, _serialize(data).encode('utf8'), version)
+    def _get_old(self):
+        """get and parse data stored in self.path."""
+
+        def _deserialize(d):
+            if not len(d):
+                return {}
+            return dict(l.split(self.OLD_SEPARATOR) for l in d.split('\n'))
+
+        data, stat = self.zk.get(self.path)
+        return _deserialize(data.decode('utf8')), stat.version
 
 
 class Env(unicode):
