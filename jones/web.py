@@ -76,7 +76,7 @@ def inject_services():
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('index.j2')
 
 
 def service_create(env, jones):
@@ -140,7 +140,7 @@ def service_get(env, jones):
     if request_wants('application/json'):
         return jsonify(vals)
     else:
-        return render_template('service.html', **vals)
+        return render_template('service.j2', **vals)
 
 
 SERVICE = {

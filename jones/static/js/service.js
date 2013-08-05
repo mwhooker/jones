@@ -41,7 +41,7 @@ $(function() {
 
       $('input', form).focus();
       $(form).submit(function() {
-        $(this).attr('action', env + '/' + $('input', this).val());
+        $(this).attr('action', env + $('input', this).val());
       });
 
       return false;

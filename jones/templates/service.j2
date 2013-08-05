@@ -1,5 +1,5 @@
 {% set active_page = service -%}
-{% extends "layout.html" %}
+{% extends "layout.j2" %}
 {% block head %}
 <link rel=stylesheet href="{{ url_for('.static', filename='css/jsoneditor.css') }}">
 <link rel=stylesheet href="{{ url_for('.static', filename='prettify/prettify.css') }}">
