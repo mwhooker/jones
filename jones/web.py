@@ -23,7 +23,7 @@ from kazoo.exceptions import NoNodeException
 from itertools import repeat, izip, imap
 import json
 
-from jones import Jones
+from jones import Jones, Env
 import zkutil
 import jonesconfig
 
@@ -85,7 +85,8 @@ def service_create(env, jones):
         r.status_code = 201
         return r
     else:
-        return redirect(url_for('service', service=jones.service, env=env))
+        return redirect(url_for(
+            'service', service=jones.service, env=str(env)))
 
 
 def service_update(env, jones):
@@ -94,24 +95,24 @@ def service_update(env, jones):
         json.loads(request.form['data']),
         int(request.form['version'])
     )
-    return env or ''
+    return str(env)
 
 
 def service_delete(env, jones):
-    if not env:
+    if env.is_root:
         # deleting whole service
         jones.delete_all()
         #return redirect(url_for('index'))
     else:
         jones.delete_config(env, -1)
-    return env, 200
+    return str(env), 200
 
 
 def service_get(env, jones):
     if not jones.exists():
         return redirect(url_for('index'))
 
-    children = jones.get_child_envs()
+    children = jones.get_child_envs(Env.Root)
     is_leaf = lambda child: len(child) and not any(
         [c.find(child + '/') >= 0 for c in children])
 
@@ -156,7 +157,7 @@ ALL_METHODS = ['GET', 'PUT', 'POST', 'DELETE']
 @app.route('/service/<string:service>/<path:env>', methods=ALL_METHODS)
 def service(service, env):
     jones = Jones(service, zk)
-    environment = jones.Env(env)
+    environment = Env(env)
 
     return SERVICE[request.method.lower()](environment, jones)
 
@@ -171,7 +172,7 @@ def association(service, assoc):
         if request_wants('application/json'):
             return jsonify(jones.get_config(assoc))
     if request.method == 'PUT':
-        jones.assoc_host(assoc, jones.Env(request.form['env']))
+        jones.assoc_host(assoc, Env(request.form['env']))
         return service, 201
     elif request.method == 'DELETE':
         jones.delete_association(assoc)

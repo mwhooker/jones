@@ -96,7 +96,7 @@ class Env(object):
     def __str__(self):
         return self.name
 
-Root = Env(None)
+Env.Root = Env(None)
 
 
 class Jones(object):
@@ -245,7 +245,7 @@ class Jones(object):
         """Does this service exist in zookeeper"""
 
         return self.zk.exists(
-            self._get_env_path(Root)
+            self._get_env_path(Env.Root)
         )
 
     def delete_all(self):
@@ -304,6 +304,4 @@ class Jones(object):
         return self.zk.set(path, json.dumps(data), *args, **kwargs)
 
     def _create(self, path, data, *args, **kwargs):
-        print path
-        print data
         return self.zk.create(path, json.dumps(data), *args, **kwargs)

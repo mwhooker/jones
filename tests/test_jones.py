@@ -22,9 +22,6 @@ from tests import fixture
 from jones.jones import Jones, Env
 
 
-Root = Env(None)
-
-
 class TestJones(KazooTestCase):
 
     def setUp(self):
@@ -35,7 +32,7 @@ class TestJones(KazooTestCase):
     def test_creates_root(self):
 
         fixt = {'xy': 'z'}
-        self.jones.create_config(Root, fixt)
+        self.jones.create_config(Env.Root, fixt)
         print json.loads(self.client.get(self.jones.view_path)[0])
         self.assertEquals(
             json.loads(self.client.get(self.jones.view_path)[0]),
@@ -51,8 +48,8 @@ class TestJones(KazooTestCase):
         )
 
     def test_overwrites(self):
-        self.jones.create_config(Root, {"foo": "bar"})
-        self.jones.set_config(Root, {"foo": "baz"}, -1)
+        self.jones.create_config(Env.Root, {"foo": "bar"})
+        self.jones.set_config(Env.Root, {"foo": "baz"}, -1)
 
         self.assertEquals(
             self.jones._get(self.jones.conf_path)[1]['foo'],
@@ -75,8 +72,8 @@ class TestJones(KazooTestCase):
 
     def test_conflicts(self):
 
-        self.jones.create_config(Root, {"foo": "bar"})
-        self.jones.set_config(Root, {"foo": "baz"}, 0)
+        self.jones.create_config(Env.Root, {"foo": "bar"})
+        self.jones.set_config(Env.Root, {"foo": "baz"}, 0)
 
         self.assertEquals(
             self.jones._get(self.jones.conf_path)[1]['foo'],
@@ -86,7 +83,7 @@ class TestJones(KazooTestCase):
         self.assertRaises(
             BadVersionException,
             self.jones.set_config,
-            Root, {"foo": "bag"}, 4,
+            Env.Root, {"foo": "bag"}, 4,
         )
 
     def test_delete_config(self):
@@ -118,7 +115,7 @@ class TestJones(KazooTestCase):
         self.assertRaises(
             ValueError,
             self.jones.create_config,
-            Root, 'hello'
+            Env.Root, 'hello'
         )
 
     def test_get_associations(self):
@@ -143,7 +140,7 @@ class TestJones(KazooTestCase):
     def test_create_service(self):
         """Test that creating a service creates stub conf/view/nodemaps."""
 
-        env = Root
+        env = Env.Root
         self.jones.create_config(env, {})
         self.assertEquals(self.jones.get_associations(env), None)
         self.assertEquals(self.jones.get_view_by_env(env), {})
@@ -152,13 +149,13 @@ class TestJones(KazooTestCase):
 
     def test_exists_reflectes_creation(self):
         self.assertFalse(self.jones.exists())
-        self.jones.create_config(Root, {})
+        self.jones.create_config(Env.Root, {})
         self.assertTrue(self.jones.exists())
 
     def test_delete_service(self):
         """Test that deleting a service removes all sub-nodes."""
 
-        env = Root
+        env = Env.Root
         self.jones.create_config(env, {})
 
         self.jones.delete_all()
