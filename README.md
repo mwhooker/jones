@@ -82,7 +82,7 @@ Example data tree dump. This shows data for an example service:
 /services
  /services/test
     /services/test/nodemaps
-      Wolfe.local -> /services/test/views/child1/baby/
+      {"example": "/services/test/views/child1/sib"}
     /services/test/conf
       {"foo": "bar", "fiesasld": "value31"}
       /services/test/conf/child1
@@ -126,6 +126,28 @@ Glossary
   update view with node.config</pre>
   </dd>
 </dl>
+
+Changelog
+---------
+
+Jones uses [Semantic Versioning](http://semver.org/).
+
+> Given a version number MAJOR.MINOR.PATCH, increment the:
+
+> MAJOR version when you make incompatible API changes,
+MINOR version when you add functionality in a backwards-compatible manner, and
+PATCH version when you make backwards-compatible bug fixes.
+Additional labels for pre-release and build metadata are available as extensions to the MAJOR.MINOR.PATCH format.
+
+### 0.7.0
+   * Upgraded to Bootstrap 3.0rc1
+   * Turned the loosely defined `env` into a type
+   * Fixed numerous bugs and style issues
+
+### 1.0.0
+   * Updated Kazoo to 1.12.1
+   * Rewrote the ZKNodeMap class to serialize to json instead of the legacy format.
+      * the code is smart enough to update the map format on the fly, but I advise you to test on your set up, first.
 
 Screenshot
 ----------
