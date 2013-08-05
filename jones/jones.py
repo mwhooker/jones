@@ -15,7 +15,20 @@ limitations under the License.
 from functools import partial
 import collections
 import json
-import zkutil
+from jones import zkutil
+
+import sys
+PY3 = sys.version > '3'
+if PY3:
+    import codecs
+
+    def b(x):
+        return codecs.latin_1_encode(x)[0]
+    str_class = str
+else:
+    def b(x):
+        return x
+    str_class = unicode
 
 
 class ZNodeMap(object):
@@ -52,6 +65,11 @@ class ZNodeMap(object):
         del zmap[name]
         self._set(zmap, version)
 
+    def _set(self, data, version):
+        """serialize and set data to self.path."""
+
+        self.zk.set(self.path, b(json.dumps(data)), version)
+
     def _get(self):
         """get and parse data stored in self.path."""
 
@@ -61,11 +79,6 @@ class ZNodeMap(object):
         if self.OLD_SEPARATOR in data:
             return self._get_old()
         return json.loads(data), stat.version
-
-    def _set(self, data, version):
-        """serialize and set data to self.path."""
-
-        self.zk.set(self.path, json.dumps(data), version)
 
     def _get_old(self):
         """get and parse data stored in self.path."""
@@ -79,7 +92,7 @@ class ZNodeMap(object):
         return _deserialize(data.decode('utf8')), stat.version
 
 
-class Env(unicode):
+class Env(str_class):
     def __new__(cls, name):
         if not name:
             empty = True
@@ -87,7 +100,7 @@ class Env(unicode):
         else:
             assert name[0] != '/'
             empty = False
-        s = unicode.__new__(cls, name)
+        s = str_class.__new__(cls, name)
         s._empty = empty
         return s
 
@@ -298,7 +311,7 @@ class Jones(object):
         return metadata.version, json.loads(data)
 
     def _set(self, path, data, *args, **kwargs):
-        return self.zk.set(path, json.dumps(data), *args, **kwargs)
+        return self.zk.set(path, b(json.dumps(data)), *args, **kwargs)
 
     def _create(self, path, data, *args, **kwargs):
-        return self.zk.create(path, json.dumps(data), *args, **kwargs)
+        return self.zk.create(path, b(json.dumps(data)), *args, **kwargs)
