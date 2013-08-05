@@ -78,31 +78,33 @@ Associations are a simple key to env map, stored under /nodemaps.
 Example data tree dump. This shows data for an example service:
 
 ```
+/
 /services
-  /testservice
-    /conf
-      foo = u'bar'
-      /parent
-        a = 1
-        b = [1, 2, 3]
-        c = {u'x': 0}
-        /child1
-          a = 2
-    /nodemaps
-      127.0.0.1 -> /services/testservice/views/parent
-      127.0.0.2 -> /services/testservice/views/parent/child1
-    /views
-      foo = u'bar'
-      /parent
-        a = 1
-        b = [1, 2, 3]
-        c = {u'x': 0}
-        foo = u'bar'
-        /child1
-          a = 2
-          b = [1, 2, 3]
-          c = {u'x': 0}
-          foo = u'bar'
+ /services/test
+    /services/test/nodemaps
+      Wolfe.local -> /services/test/views/child1/baby/
+    /services/test/conf
+      {"foo": "bar", "fiesasld": "value31"}
+      /services/test/conf/child1
+        {"field": "HAILSATAN"}
+        /services/test/conf/child1/sib
+          {"foo": "big"}
+        /services/test/conf/child1/baby
+          {"foo": "baz"}
+    /services/test/views
+      {"foo": "bar", "fiesasld": "value31"}
+      /services/test/views/child1
+        {"field": "HAILSATAN", "foo": "bar", "fiesasld": "value31"}
+        /services/test/views/child1/sib
+          {"field": "HAILSATAN", "foo": "big", "fiesasld": "value31"}
+        /services/test/views/child1/baby
+          {"field": "HAILSATAN", "foo": "baz", "fiesasld": "value31"}
+  /services/test2
+    /services/test2/nodemaps
+    /services/test2/conf
+      {}
+    /services/test2/views
+      {}
 ```
 
 Glossary
