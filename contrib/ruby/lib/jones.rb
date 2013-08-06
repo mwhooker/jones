@@ -112,13 +112,3 @@ class JonesClient
     "#{@zkroot}/conf"
   end
 end
-
-
-#zk = ZK.new('localhost:2181')
-
-jc = JonesClient.new(:zkservers => 'localhost:2181', :service => 'test')
-jc.register_callback { |data| puts data['field'] }
-puts jc['field']
-
-sleep(20)
-puts jc['field']
