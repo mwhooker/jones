@@ -1,0 +1,34 @@
+{
+  "name": "jones",
+  "description": "Installs/Configures jones",
+  "long_description": "Description\n===========\nWIP\n\nRequirements\n============\n\nAttributes\n==========\n\nUsage\n=====\n\n",
+  "maintainer": "Matthew Hooker",
+  "maintainer_email": "mwhooker@gmail.com",
+  "license": "All rights reserved",
+  "platforms": {
+  },
+  "dependencies": {
+    "python": ">= 0.0.0",
+    "nginx_conf": ">= 0.0.0",
+    "zookeeper": ">= 0.0.0",
+    "application": ">= 0.0.0",
+    "application_python": ">= 0.0.0"
+  },
+  "recommendations": {
+  },
+  "suggestions": {
+  },
+  "conflicting": {
+  },
+  "providing": {
+  },
+  "replacing": {
+  },
+  "attributes": {
+  },
+  "groupings": {
+  },
+  "recipes": {
+  },
+  "version": "1.0.0"
+}
