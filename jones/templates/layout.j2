@@ -23,13 +23,12 @@ limitations under the License.
     <link rel=stylesheet href="{{ url_for('.static', filename='css/global.css') }}">
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
     {% block head %}{% endblock %}
-
   </head>
 
   <body>
 
     <div class="navbar navbar-fixed-top">
-      <a class="navbar-brand" href="#">Jones</a>
+      <a class="navbar-brand" href="/">Jones</a>
       <ul class="nav navbar-nav">
           {% for href, id, caption in navigation_bar %}
           <li{% if id == active_page %} class="active"{% endif %}>
@@ -58,8 +57,9 @@ limitations under the License.
               <li class="divider"></li>
               <li>
               <form class="navbar-form pull-left" method="post">
+                <p>
                   <input type="text" class="form-control" placeholder="Add Service…">
-                  <button type="submit" class="btn btn-default">Submit</button>
+                </p>
               </form>
               </li>
           </ul>
@@ -86,11 +86,36 @@ limitations under the License.
     </div>
 
     <script src="{{ url_for('.static', filename='js/jquery-1.7.2.min.js') }}"></script>
+    <script src="{{ url_for('.static', filename='js/underscore-min.js') }}"></script>
     <script src="{{ url_for('.static', filename='js/bootstrap.min.js') }}"></script>
     <script>
+        function validate(parts, success) {
+            /*
+            validate that no parts contain a slash
+            add a slash to the end
+            submit it through the form
+            */
+            var success, parts;
+            parts = _.flatten(_.initial(arguments));
+            success = _.last(arguments);
+
+            var valid = _.every(parts, function(elem) {
+                return elem.search('/') == -1;
+            });
+
+            if (valid === true) {
+                success('/' + parts.join('/') + '/');
+            } else {
+                //TODO: set off errors and stuff.
+                console.log('no /s');
+                return false;
+            }
+        }
         $(function() {
             $('#service-nav form').submit(function() {
-                $(this).attr('action', '/service/' + $('input', this).val());
+                return validate('service', $('input', this).val(), function(path) {
+                    $(this).attr('action', path);
+                });
             });
         });
     </script>

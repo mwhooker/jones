@@ -14,13 +14,13 @@ limitations under the License.
 
 
 from flask import Flask, jsonify, redirect, render_template, request, url_for
-from raven.contrib.flask import Sentry
-from werkzeug.contrib.fixers import ProxyFix
+from itertools import repeat, izip, imap
 from jinja2 import Markup
-from kazoo.security import make_acl, make_digest_acl_credential
 from kazoo.client import KazooClient
 from kazoo.exceptions import NoNodeException
-from itertools import repeat, izip, imap
+from kazoo.security import make_acl, make_digest_acl_credential
+from raven.contrib.flask import Sentry
+from werkzeug.contrib.fixers import ProxyFix
 import json
 
 from jones import Jones, Env
@@ -50,7 +50,12 @@ zk = KazooClient(
 )
 zk.start()
 zk.add_auth('digest', jones_credential)
-zk.ensure_path('/services')
+
+
+@zk.DataWatch('/services')
+def ensure_root(data, stat):
+    if not data:
+        zk.ensure_path('/services')
 
 
 def request_wants(t):
@@ -85,6 +90,9 @@ def service_create(env, jones):
         r.status_code = 201
         return r
     else:
+        if env.is_root:
+            env = None
+
         return redirect(url_for(
             'service', service=jones.service, env=env))
 
