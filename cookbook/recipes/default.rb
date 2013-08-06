@@ -19,7 +19,7 @@
 
 include_recipe "gunicorn"
 include_recipe "nginx"
-chef_gem "zookeeper"
+include_recipe "supervisor"
 package "libevent-dev"
 
 user node[:jones][:user] do
@@ -34,22 +34,6 @@ directory node[:jones][:destination] do
 end
 
 config_path = "#{node[:jones][:destination]}/shared/jonesconfig.py"
-
-ruby_block 'set-exhibitor-hostname' do
-  block do
-    if not node[:kafka][:config][:zk_connect].is_a? String
-      host = exhibitor_url()
-      node.override[:jones][:zk_connect] = zk_connect_str(
-        discover_zookeepers(host), node[:jones][:zk_chroot])
-    end
-    zookeeper_node '/' do
-      action :create_if_missing
-      connect_str node[:jones][:zk_connect]
-    end
-  end
-  action :nothing
-end
-
 venv = "#{node[:jones][:destination]}/shared/env"
 
 python_virtualenv venv do
@@ -77,7 +61,6 @@ application "jones" do
     app_module "jones.web:app"
     virtualenv venv
   end
-
 end
 
 template config_path do
@@ -85,13 +68,17 @@ template config_path do
   owner "root"
   group "root"
   mode "0644"
-  # TODO
-  # notifies :restart, "supervisor_service[jones]"
   variables(
     :config => node[:jones][:config],
-    :zk_connect_str => node[:jones][:zk_connect]
+    :zk_connect_str => zk_connect_str(
+      discover_zookeepers(node[:exhibitor][:hostname]),
+      node[:jones][:zk_chroot])
   )
-  notifies :create, 'ruby_block[set-exhibitor-hostname]', :immediately
+end
+
+supervisor_service "jones" do
+  subscribes :before_deploy, "application[jones]"
+  action :start
 end
 
 nginx_conf_file "jones" do
