@@ -22,6 +22,9 @@ include_recipe "nginx"
 include_recipe "supervisor"
 package "libevent-dev"
 
+node.override['nginx']['default_site_enabled'] = false
+node.override['nginx_conf']['pre_socket'] = 'http://'
+
 user node[:jones][:user] do
   uid node[:jones][:uid]
   gid node[:jones][:group]
