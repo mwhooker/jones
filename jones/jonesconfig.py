@@ -19,5 +19,5 @@ _basedir = os.path.abspath(os.path.dirname(__file__))
 DEBUG = True
 TESTING = True
 SECRET_KEY = 'developement key'
-ZK_CONNECTION_STRING = ''
+ZK_CONNECTION_STRING = '127.0.0.1:2181'
 ZK_DIGEST_PASSWORD = 'changeme'

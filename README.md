@@ -1,19 +1,16 @@
-jones
-=====
+# jones
 
 [![travis][2]][1]
 
 Jones is a configuration frontend for Zookeeper.
 
-Goals
------
+## Goals
 
    * Clients MUST only talk to zookeeper
    * Accessing configuration MUST be simple (i.e. no computation)
    * Unique views of the config must be available on a host-by-host basis
 
-Introduction
-------------
+## Introduction
 
 At their root, most configuration systems are a hierarchy of dictionaries. The
 root has config common to all environments, with config specific to say,
@@ -29,8 +26,7 @@ For more information, see my
 [talk](http://pyvideo.org/video/1567/configuration-management-with-zookeeper)
 and [presentation](https://speakerdeck.com/mwhooker/jones) at Pycon Canada.
 
-Running the Server
------------------
+## Running the Server
 
 Jones uses the [Flask](http://flask.pocoo.org/) web framework. For development,
 running the server is as simple as `python jones/web.py`.
@@ -42,8 +38,18 @@ Gunicorn](http://docs.gunicorn.org/en/latest/run.html). For help on deploying
 gunicorn with nginx, see [Deploying
 Gunicorn](http://docs.gunicorn.org/en/latest/deploy.html)
 
-Using the client
-----------------
+### Configuring
+
+Jones uses [Flask's configuration
+handling](http://flask.pocoo.org/docs/config/). It comes wsith a [default
+config](https://github.com/mwhooker/jones/blob/master/jones/jonesconfig.py)
+which should modified before running the server.
+
+You can override it by creating your own config with the right values plugged
+in, and setting the environmental variable JONES_SETTINGS to the path to that
+file.
+
+## Using the client
 
 Jones comes with an example client, which we hope will serve the most general
 case.  It's also incredibly simple (only 30 lines), so it should be easy to
@@ -80,8 +86,7 @@ The JonesClient object also takes an optional callback and association.
   <dd>A key in the _associations_ map. By default JonesClient uses socket.getfqdn().</dd>
 </dl>
 
-Design
-------
+## Design
 
 Environments are stored under their parent znodes on the zookeeper data tree.
 On write, the view algorithm is used to materialize the "inherited" config in
@@ -127,8 +132,7 @@ Example data tree dump. This shows data for an example service:
       {}
 ```
 
-Glossary
---------
+## Glossary
 
 <dl>
   <dt>Config Tree</dt>
@@ -147,8 +151,7 @@ Glossary
   </dd>
 </dl>
 
-Changelog
----------
+## Changelog
 
 Jones uses [Semantic Versioning](http://semver.org/).
 
@@ -161,17 +164,24 @@ for pre-release and build metadata are available as extensions to the
 MAJOR.MINOR.PATCH format.
 
 ### 0.7.0
+
    * Upgraded to Bootstrap 3.0rc1
    * Turned the loosely defined `env` into a type
    * Fixed numerous bugs and style issues
 
 ### 1.0.0
+
    * Updated Kazoo to 1.12.1
    * Rewrote the ZKNodeMap class to serialize to json instead of the legacy format.
       * the code is smart enough to update the map format on the fly, but I advise you to test on your set up, first.
 
-Screenshot
-----------
+### 1.1.0
+
+    * Changed default ZK_CONNECTION_STRING to assume a local zk instance.
+    * Ensure zk path exists on run.
+    * Change the nodemap structure to json. This change should be backwards compatible.
+
+## Screenshot
 ![Example](http://mwhooker.github.com/jones/docs/img/testservice.png)
 
   [1]: https://travis-ci.org/mwhooker/jones
