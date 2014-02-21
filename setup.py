@@ -16,7 +16,8 @@ limitations under the License.
 
 from setuptools import setup
 
-VERSION = '1.1.0'
+# version only changes when client changes.
+VERSION = '1.0.0'
 NAME = 'jones'
 
 install_requires = [

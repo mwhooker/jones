@@ -163,6 +163,17 @@ PATCH version when you make backwards-compatible bug fixes.  Additional labels
 for pre-release and build metadata are available as extensions to the
 MAJOR.MINOR.PATCH format.
 
+### About Versioning
+
+Only the python client is packaged and available on pypi. Thus, the version
+number only applies to changes to the client. We intend that the web server be
+checked out of version control, and leave it up to the user to decide which
+version to use. We'll try to make sure the server and clients maintain back and
+forwards compatibility. This may be a mistake, but since the client and server
+are essentially frozen at this point, we'll leave it as it is for now. If
+we make any changes impacing bc/fc, we'll have to revisit this.
+
+
 ### 0.7.0
 
    * Upgraded to Bootstrap 3.0rc1
@@ -174,12 +185,6 @@ MAJOR.MINOR.PATCH format.
    * Updated Kazoo to 1.12.1
    * Rewrote the ZKNodeMap class to serialize to json instead of the legacy format.
       * the code is smart enough to update the map format on the fly, but I advise you to test on your set up, first.
-
-### 1.1.0
-
-    * Changed default ZK_CONNECTION_STRING to assume a local zk instance.
-    * Ensure zk path exists on run.
-    * Change the nodemap structure to json. This change should be backwards compatible.
 
 ## Screenshot
 ![Example](http://mwhooker.github.com/jones/docs/img/testservice.png)
