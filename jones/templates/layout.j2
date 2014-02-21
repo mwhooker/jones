@@ -113,8 +113,9 @@ limitations under the License.
         }
         $(function() {
             $('#service-nav form').submit(function() {
+                that = this
                 return validate('service', $('input', this).val(), function(path) {
-                    $(this).attr('action', path);
+                    $(that).attr('action', path);
                 });
             });
         });
