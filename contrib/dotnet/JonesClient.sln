@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.21005.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JonesClient", "JonesClient\JonesClient.csproj", "{E19B20BC-15E9-48D6-933E-9737C5314A5D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JonesClientTest", "JonesClientTest\JonesClientTest.csproj", "{6681B168-EEC1-47E1-927F-CAA16FCB91F0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JonesClientTestConsoleApp", "JonesClientTestConsoleApp\JonesClientTestConsoleApp.csproj", "{A17DA404-E9D5-4A1F-A0D2-089A6B9B44D6}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E19B20BC-15E9-48D6-933E-9737C5314A5D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E19B20BC-15E9-48D6-933E-9737C5314A5D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E19B20BC-15E9-48D6-933E-9737C5314A5D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E19B20BC-15E9-48D6-933E-9737C5314A5D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6681B168-EEC1-47E1-927F-CAA16FCB91F0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6681B168-EEC1-47E1-927F-CAA16FCB91F0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6681B168-EEC1-47E1-927F-CAA16FCB91F0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6681B168-EEC1-47E1-927F-CAA16FCB91F0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A17DA404-E9D5-4A1F-A0D2-089A6B9B44D6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A17DA404-E9D5-4A1F-A0D2-089A6B9B44D6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A17DA404-E9D5-4A1F-A0D2-089A6B9B44D6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A17DA404-E9D5-4A1F-A0D2-089A6B9B44D6}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
