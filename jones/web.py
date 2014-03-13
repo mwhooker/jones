@@ -122,7 +122,7 @@ def service_get(env, jones):
 
     children = jones.get_child_envs(Env.Root)
     is_leaf = lambda child: len(child) and not any(
-        [c.find(child + '/') >= 0 for c in children])
+        c.find(child + '/') >= 0 for c in children)
 
     try:
         version, config = jones.get_config_by_env(env)
@@ -161,14 +161,13 @@ ALL_METHODS = ['GET', 'PUT', 'POST', 'DELETE']
 @app.route('/service/<string:service>/', defaults={'env': None},
            methods=ALL_METHODS)
 @app.route('/service/<string:service>/<path:env>/', methods=ALL_METHODS)
-def service(service, env):
+def services(service, env):
     jones = Jones(service, zk)
     environment = Env(env)
 
     return SERVICE[request.method.lower()](environment, jones)
 
 
-# TODO: what if we have a path called association?
 @app.route('/service/<string:service>/association/<string:assoc>',
            methods=['GET', 'PUT', 'DELETE'])
 def association(service, assoc):
