@@ -254,7 +254,7 @@ class Jones(object):
         envs = zkutil.walk(self.zk, prefix)
         return map(lambda e: e[len(prefix)+1:], envs)
 
-    def _flatten_to_root(self, env):
+    def _flatten_from_root(self, env):
         """
         Flatten values from root down in to new view.
         """
@@ -283,7 +283,7 @@ class Jones(object):
         if not self.zk.exists(dest):
             self.zk.ensure_path(dest)
 
-        self._set(dest, self._flatten_to_root(env))
+        self._set(dest, self._flatten_from_root(env))
 
     def _get_path_by_env(self, prefix, env):
         if env.is_root:
