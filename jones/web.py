@@ -94,7 +94,7 @@ def service_create(env, jones):
             env = None
 
         return redirect(url_for(
-            'service', service=jones.service, env=env))
+            'services', service=jones.service, env=env))
 
 
 def service_update(env, jones):
@@ -127,7 +127,7 @@ def service_get(env, jones):
     try:
         version, config = jones.get_config_by_env(env)
     except NoNodeException:
-        return redirect(url_for('service', service=jones.service))
+        return redirect(url_for('services', service=jones.service))
 
     childs = imap(dict, izip(
         izip(repeat('env'), imap(Env, children)),
