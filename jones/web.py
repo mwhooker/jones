@@ -39,23 +39,31 @@ if 'SENTRY_DSN' in app.config:
 jones_credential = make_digest_acl_credential(
     'Jones', app.config['ZK_DIGEST_PASSWORD']
 )
-zk = KazooClient(
-    app.config['ZK_CONNECTION_STRING'],
-    default_acl=(
-        # grants read permissions to anyone.
-        make_acl('world', 'anyone', read=True),
-        # grants all permissions to the creator of the node.
-        make_acl('auth', '', all=True)
-    )
-)
-zk.start()
-zk.add_auth('digest', jones_credential)
+
+_zk = None
 
 
-@zk.DataWatch('/services')
+def get_zk():
+    global _zk
+    if _zk is None:
+        _zk = KazooClient(
+            app.config['ZK_CONNECTION_STRING'],
+            default_acl=(
+                # grants read permissions to anyone.
+                make_acl('world', 'anyone', read=True),
+                # grants all permissions to the creator of the node.
+                make_acl('auth', '', all=True)
+            )
+        )
+        _zk.start()
+        _zk.add_auth('digest', jones_credential)
+        _zk.DataWatch('/services', func=ensure_root)
+    return _zk
+
+
 def ensure_root(data, stat):
     if not data:
-        zk.ensure_path('/services')
+        get_zk().ensure_path('/services')
 
 
 def request_wants(t):
@@ -73,8 +81,8 @@ def as_json(d, indent=None):
 
 @app.context_processor
 def inject_services():
-    return dict(services=[child for child in zk.get_children('/services') if
-                          Jones(child, zk).exists()])
+    return dict(services=[child for child in get_zk().get_children('/services') if
+                          Jones(child, get_zk()).exists()])
 
 
 @app.route('/')
@@ -162,7 +170,7 @@ ALL_METHODS = ['GET', 'PUT', 'POST', 'DELETE']
            methods=ALL_METHODS)
 @app.route('/service/<string:service>/<path:env>/', methods=ALL_METHODS)
 def services(service, env):
-    jones = Jones(service, zk)
+    jones = Jones(service, get_zk())
     environment = Env(env)
 
     return SERVICE[request.method.lower()](environment, jones)
@@ -171,7 +179,7 @@ def services(service, env):
 @app.route('/service/<string:service>/association/<string:assoc>',
            methods=['GET', 'PUT', 'DELETE'])
 def association(service, assoc):
-    jones = Jones(service, zk)
+    jones = Jones(service, get_zk())
 
     if request.method == 'GET':
         if request_wants('application/json'):
@@ -186,7 +194,7 @@ def association(service, assoc):
 
 @app.route('/export')
 def export():
-    return zkutil.export_tree(zk, '/')
+    return zkutil.export_tree(get_zk(), '/')
 
 
 if __name__ == '__main__':
